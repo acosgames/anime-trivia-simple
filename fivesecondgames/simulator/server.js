@@ -71,22 +71,32 @@ io.on('connection', (socket) => {
             }
             else {
                 if (msg.type == 'skip') {
-                    if (lastGame) {
-                        let deadline = lastGame.next.deadline;
-                        let now = (new Date()).getTime();
-                        if (now < deadline) {
-                            return;
-                        }
-                        msg.payload = {
-                            id: lastGame.next.id,
-                            deadline, now
-                        }
-                    }
+
                 }
                 else if (lastGame) {
                     if (lastGame.next.id != '*' && lastGame.next.id != msg.user.id)
                         return;
                 }
+            }
+
+            if (lastGame) {
+                let deadline = lastGame.next.deadline;
+                let now = (new Date()).getTime();
+                if (msg.type == 'skip') {
+                    if (now < deadline)
+                        return;
+                    msg.payload = {
+                        id: lastGame.next.id,
+                        deadline, now
+                    }
+                }
+                else {
+                    if (!msg.payload)
+                        msg.payload = {};
+                    msg.payload.deadline = deadline;
+                    msg.payload.now = now;
+                }
+
             }
 
             worker.postMessage(msg);
@@ -105,9 +115,13 @@ function processTimelimit(next) {
     let seconds = next.timelimit;
     seconds = Math.min(60, Math.max(10, seconds));
 
-    let now = (new Date()).getTime();
-    let deadline = now + (seconds * 1000);
-    next.deadline = deadline;
+    if (next.timelimit > 0 && !next.deadline || !next.now || next.now >= next.deadline) {
+        let now = (new Date()).getTime();
+        let deadline = now + (seconds * 1000);
+        next.deadline = deadline;
+        next.now = now;
+    }
+
 }
 
 function createWorker(index) {

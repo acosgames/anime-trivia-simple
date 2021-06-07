@@ -21,7 +21,7 @@ class Timeleft extends Component {
         }
 
 
-        return (<span>{timeleft}</span>)
+        return (<div><div>{this.props['state-round']}</div><span>{timeleft}</span></div>)
     }
 
     render() {
@@ -35,4 +35,4 @@ class Timeleft extends Component {
 
 }
 
-export default fs.connect(['nextTimeLeft'])(Timeleft);
+export default fs.connect(['nextTimeLeft', 'state-round'])(Timeleft);

@@ -6,7 +6,7 @@ class FSG {
         this.nextGame = JSON.parse(JSON.stringify(globals.game()));
         this.isNewGame = false;
         this.markedForDelete = false;
-        this.nextTimeLimit = 0;
+        this.nextTimeLimit = this.originalGame.next && this.originalGame.next.timelimit || 0;
         this.kickedPlayers = [];
 
         if (!this.nextGame || Object.keys(this.nextGame.rules).length == 0) {
@@ -149,6 +149,12 @@ class FSG {
 
     setTimeLimit(seconds) {
         this.nextTimeLimit = Math.min(60, Math.max(10, seconds));
+        delete this.nextGame.deadline;
+        delete this.nextGame.now;
+    }
+
+    reachedTimeLimit() {
+        return this.originalGame.next.deadline && this.originalGame.next.now && this.originalGame.next.now >= this.originalGame.next.deadline;
     }
 
     event(name) {

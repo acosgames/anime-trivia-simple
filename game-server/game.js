@@ -28,32 +28,26 @@ class PopTrivia {
     }
 
     onSkip() {
-        let action = fsg.action();
-        let next = fsg.next();
-        let players = fsg.players();
-        let state = fsg.state();
 
-        state.round = state.round + 1;
-        fsg.next({
-            id: '*',
-            timelimit: 60
-        })
 
-        this.processCorrectAnswers();
-        this.nextRound();
+        if (fsg.reachedTimeLimit())
+            this.nextRound();
     }
 
     nextRound() {
+        this.processCorrectAnswers();
+
         let state = fsg.state();
         state.round = state.round + 1;
-
-
         fsg.next({
             id: '*',
-            timelimit: 60
         })
+        fsg.setTimeLimit(20);
 
-        if (state.round > 10) {
+        this.resetPlayerChoices();
+
+        let rules = fsg.rules();
+        if (state.round > rules.rounds) {
             this.processWinners();
             return;
         }
@@ -61,22 +55,35 @@ class PopTrivia {
         this.processNextQuestion();
     }
 
+    resetPlayerChoices() {
+        let players = fsg.players();
+        for (var id in players) {
+            let player = players[id];
+            player.choice = null;
+        }
+    }
+
     processNextQuestion() {
         let state = fsg.state();
 
+        //find a random question not asked before
         let qid = Math.floor(Math.random() * questions.length);
         if (state.history.includes(qid)) {
             this.processNextQuestion();
             return;
         }
+
+        //setup next question
         let question = questions[qid];
         state.qid = qid;
         state.question = question.q;
         state.category = question.c;
         if (question.t == 'boolean') {
+            //always True then False in the choices
             state.choices = ['True', 'False']
         }
         else {
+            //sort the choices alphabetically
             state.choices = [];
             state.choices.push(question.a);
             for (let i = 0; i < question.i.length; i++) {
@@ -84,6 +91,8 @@ class PopTrivia {
             }
             state.choices.sort();
         }
+        //save this question in history to avoid choosing again
+        state.history.push(qid);
     }
 
     processWinners() {
@@ -91,26 +100,30 @@ class PopTrivia {
         let playerIds = [];
         let players = fsg.players();
 
+        //add player id into the player data
         for (var id in players) {
             players[id].id = id;
             playerList.push(players[id]);
         }
 
+        //sort all players by their points
         playerList.sort((a, b) => {
             b.points - a.points;
         })
 
+        //get the top 10
         let winners = [];
         for (var i = 0; i < Math.min(playerList.length, 10); i++) {
-            let id = playerIds[i];
-            winners.push(id);
+            let player = playerList[i];
+            winners.push(player.id);
         }
 
-        //don't let this get sent over network
+        //remove id, so we don't send over network
         for (var id in players) {
             delete players[id]['id'];
         }
 
+        let state = fsg.state();
         state.winners = winners;
         fsg.events('winner');
 
@@ -120,7 +133,10 @@ class PopTrivia {
     processCorrectAnswers() {
         let players = fsg.players();
         let state = fsg.state();
+        if (state.round <= 0)
+            return;
 
+        //award points for correct choices, remove points for wrong choices
         for (var id in players) {
             let player = players[id];
             if (typeof player.choice == 'undefined' || player.choice == null)
@@ -145,9 +161,9 @@ class PopTrivia {
         let user = fsg.players(action.user.id);
         if (!user)
             return;
+
+        //new player defaults
         user.points = 0;
-        // if (fsg.players(action.user.id).type)
-        //     return;
 
         this.checkStartGame();
     }
@@ -157,34 +173,29 @@ class PopTrivia {
         let maxPlayers = fsg.rules('maxPlayers') || 2;
         let playerCount = fsg.playerCount();
         if (playerCount >= maxPlayers) {
-            this.startGame();
+            let players = fsg.players();
+            for (var id in players)
+                players[id].points = 0;
+
+            this.nextRound();
         }
     }
 
-    startGame() {
-        //set points to 0
-        let players = fsg.players();
-        for (var id in players)
-            players[id].points = 0;
-
-        this.nextRound();
-        // players[state.startPlayer].type = 'X';
-    }
-
     onLeave() {
-        let action = fsg.action();
-        this.playerLeave(action.user.id);
-    }
-
-    playerLeave(id) {
         let players = fsg.players();
-        // let otherPlayerId = null;
         if (players[id]) {
             delete players[id];
         }
     }
 
     onPick() {
+
+        if (fsg.reachedTimeLimit()) {
+            this.nextRound();
+            fsg.log("Pick passed timelimit, getting new round");
+            return;
+        }
+
         let state = fsg.state();
         let action = fsg.action();
         let user = fsg.players(action.user.id);
@@ -201,37 +212,6 @@ class PopTrivia {
         state.picked = user.id;
     }
 
-
-    findWinners() {
-        let playerList = [];
-        let players = fsg.players();
-        for (var id in players) {
-            let player = players[id];
-            playerList.push(player);
-        }
-
-        playerList.sort((a, b) => {
-            return b.points - a.points;
-        })
-
-        return playerList;
-    }
-
-    // set the winner event and data
-    setWinner() {
-        //find user who matches the win type
-        let players = this.findWinners();
-        if (!players) {
-            log.error('Winning Players not found???');
-            return;
-        }
-        fsg.clearEvents();
-        fsg.event('winner')
-        let state = fsg.state();
-        state.winner = player.id;
-
-        fsg.killGame();
-    }
 }
 
 export default new PopTrivia();

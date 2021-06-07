@@ -91,8 +91,14 @@ class FSGWorker {
             return;
         }
 
+
         if (!globalGame)
             this.makeGame();
+
+        if (msg.payload.deadline && msg.payload.now) {
+            globalGame.next.deadline = msg.payload.deadline;
+            globalGame.next.now = msg.payload.now;
+        }
 
         if (msg.type == 'join') {
             let userid = msg.user.id;

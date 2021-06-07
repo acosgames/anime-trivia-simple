@@ -26,14 +26,20 @@ class Skip extends Component {
     }
 
     skipPlayer() {
-        let id = this.props['next-id'];
-        send('skip', { id })
+        // let id = this.props['next-id'];
+        send('skip')
+        send('skip')
+        send('skip')
+        send('skip')
+        send('skip')
+        send('skip')
+        send('skip')
     }
 
     render() {
 
         let id = this.props['next-id'];
-        if (!id || id != this.props.id) {
+        if (id != '*') {
             return (<React.Fragment></React.Fragment>);
         }
 
@@ -41,7 +47,7 @@ class Skip extends Component {
         let timeleft = this.props.nextTimeLeft;
         if (timeleft <= 0) {
             return (
-                <button onClick={this.skipPlayer.bind(this)}>Kick</button>
+                <button onClick={this.skipPlayer.bind(this)}>Continue</button>
             )
         }
 

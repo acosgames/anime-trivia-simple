@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import fs from 'flatstore';
 
 import { send } from '../fsg';
+import Skip from './skip';
 
 fs.set('state-question', null);
 fs.set('state-choices', null);
@@ -32,6 +33,7 @@ class Question extends Component {
 
         return (
             <div className="question">
+                <Skip></Skip>
                 <h5 dangerouslySetInnerHTML={{ __html: question }}></h5>
                 {choices.map((choice, index) =>
                 (
@@ -45,6 +47,7 @@ class Question extends Component {
                     </div>
                 )
                 )}
+
             </div>
 
         )

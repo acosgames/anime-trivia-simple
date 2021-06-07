@@ -1,5 +1,5 @@
 {
-  "name": "tictactoe",
+  "name": "poptrivia",
   "version": "0.1.0",
   "dependencies": {
     "axios": "^0.21.1",

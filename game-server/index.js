@@ -1,7 +1,7 @@
 import fsg from './fsg';
 import PopTrivia from './game';
 
-fsg.setTimeLimit(20);
+
 
 fsg.on('newgame', () => PopTrivia.onNewGame());
 fsg.on('skip', () => PopTrivia.onSkip());
