@@ -95,9 +95,9 @@ class FSGWorker {
         if (!globalGame)
             this.makeGame();
 
-        if (msg.payload.deadline && msg.payload.now) {
-            globalGame.next.deadline = msg.payload.deadline;
-            globalGame.next.now = msg.payload.now;
+        if (msg.payload.deadline && msg.payload.timeleft) {
+            // globalGame.timer.deadline = msg.payload.deadline;
+            globalGame.timer.timeleft = msg.payload.timeleft;
         }
 
         if (msg.type == 'join') {

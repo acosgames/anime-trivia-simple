@@ -28,10 +28,21 @@ class PopTrivia {
     }
 
     onSkip() {
-
-
         if (fsg.reachedTimeLimit())
             this.nextRound();
+    }
+
+    checkStartGame() {
+        //if player count reached required limit, start the game
+        let maxPlayers = fsg.rules('maxPlayers') || 2;
+        let playerCount = fsg.playerCount();
+        if (playerCount >= maxPlayers) {
+            let players = fsg.players();
+            for (var id in players)
+                players[id].points = 0;
+
+            this.nextRound();
+        }
     }
 
     nextRound() {
@@ -53,6 +64,8 @@ class PopTrivia {
         }
 
         this.processNextQuestion();
+
+        // fsg.setTimeLimit(20);
     }
 
     resetPlayerChoices() {
@@ -168,18 +181,7 @@ class PopTrivia {
         this.checkStartGame();
     }
 
-    checkStartGame() {
-        //if player count reached required limit, start the game
-        let maxPlayers = fsg.rules('maxPlayers') || 2;
-        let playerCount = fsg.playerCount();
-        if (playerCount >= maxPlayers) {
-            let players = fsg.players();
-            for (var id in players)
-                players[id].points = 0;
 
-            this.nextRound();
-        }
-    }
 
     onLeave() {
         let players = fsg.players();

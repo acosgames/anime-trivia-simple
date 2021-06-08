@@ -28,11 +28,11 @@ async function timerLoop(cb) {
 
     setTimeout(() => { timerLoop(cb) }, 100);
 
-    let next = fs.get('next');
-    if (!next)
+    let timer = fs.get('timer');
+    if (!timer)
         return;
 
-    let deadline = next.deadline;
+    let deadline = timer.deadline;
     if (!deadline)
         return;
 
@@ -43,7 +43,7 @@ async function timerLoop(cb) {
         elapsed = 0;
     }
 
-    fs.set('nextTimeLeft', elapsed);
+    fs.set('timeleft', elapsed);
 }
 
 var hasMessageEvent = false;
@@ -62,6 +62,9 @@ export async function attachMessageEvent() {
 
         if (message.local) {
             fs.set('local', message.local);
+        }
+        if (message.timer) {
+            fs.set('timer', message.timer);
         }
         if (message.state) {
             fs.set('state', message.state);

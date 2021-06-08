@@ -80,23 +80,23 @@ io.on('connection', (socket) => {
             }
 
             if (lastGame) {
-                let deadline = lastGame.next.deadline;
+                let deadline = lastGame.timer.deadline;
                 let now = (new Date()).getTime();
+                let timeleft = deadline - now;
                 if (msg.type == 'skip') {
                     if (now < deadline)
                         return;
+                    msg.user = { id: lastGame.next.id }
                     msg.payload = {
-                        id: lastGame.next.id,
-                        deadline, now
+                        timeleft
                     }
                 }
                 else {
                     if (!msg.payload)
                         msg.payload = {};
-                    msg.payload.deadline = deadline;
-                    msg.payload.now = now;
+                    msg.payload.timeleft = timeleft;
+                    // msg.payload.now = now;
                 }
-
             }
 
             worker.postMessage(msg);
@@ -111,15 +111,19 @@ io.on('connection', (socket) => {
     })
 });
 
-function processTimelimit(next) {
-    let seconds = next.timelimit;
+function processTimelimit(timer) {
+    if (!timer || !timer.timelimit)
+        return;
+
+    let seconds = timer.timelimit;
     seconds = Math.min(60, Math.max(10, seconds));
 
-    if (next.timelimit > 0 && !next.deadline || !next.now || next.now >= next.deadline) {
+    if (timer.timelimit > 0) {
         let now = (new Date()).getTime();
         let deadline = now + (seconds * 1000);
-        next.deadline = deadline;
-        next.now = now;
+        let timeleft = deadline - now;
+        timer.deadline = deadline;
+        timer.timeleft = timeleft;
     }
 
 }
@@ -133,7 +137,7 @@ function createWorker(index) {
         }
 
         if (game.next && typeof game.next.timelimit == 'number') {
-            processTimelimit(game.next);
+            processTimelimit(game.timer);
         }
 
         console.log("Outgoing Game: ", game);

@@ -154,6 +154,7 @@
 
                     message.local = Object.assign({}, socket.user, localPlayer);
                     sendFrameMessage(message);
+                    console.timeEnd('ActionLoop');
                 });
 
                 socket.on('disconnect', () => {
@@ -213,6 +214,7 @@
                 if (data.type == '__ready') {
                     return;
                 }
+                console.time('ActionLoop');
                 if (socket) socket.emit('action', data);
             }
 
