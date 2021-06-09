@@ -6,7 +6,8 @@ class FSG {
         this.nextGame = JSON.parse(JSON.stringify(globals.game()));
         this.isNewGame = false;
         this.markedForDelete = false;
-        this.nextTimeLimit = -1;
+        this.defaultSeconds = 15;
+        // this.nextTimeLimit = -1;
         this.kickedPlayers = [];
 
         if (!this.nextGame || Object.keys(this.nextGame.rules).length == 0) {
@@ -70,11 +71,18 @@ class FSG {
     }
 
     submit() {
-        if (this.nextGame.timer && this.nextTimeLimit > -1) {
-            this.nextGame.timer.timelimit = this.nextTimeLimit;
-            // if (this.markedForDelete)
-            //     delete this.nextGame.next['timelimit'];
-        }
+        // if (this.nextGame.timer && this.nextTimeLimit > -1) {
+        //     this.nextGame.timer.timelimit = this.nextTimeLimit;
+        //     // if (this.markedForDelete)
+        //     //     delete this.nextGame.next['timelimit'];
+        // }
+
+        //if next info has been updated, we force a new timer
+        // let prevNextUser = JSON.stringify(this.originalGame.next);
+        // let curNextUser = JSON.stringify(this.nextGame.next);
+        // if (prevNextUser != curNextUser && typeof this.nextGame.timer.set == 'undefined') {
+        //     this.setTimelimit()
+        // }
 
         if (this.kickedPlayers.length > 0)
             this.nextGame.kick = this.kickedPlayers;
@@ -151,14 +159,17 @@ class FSG {
         return this.nextGame.next;
     }
 
-    setTimeLimit(seconds) {
-        this.nextTimeLimit = Math.min(60, Math.max(10, seconds));
-        delete this.nextGame.timer.deadline;
-        delete this.nextGame.timer.now;
+    setTimelimit(seconds) {
+        seconds = seconds || this.defaultSeconds;
+        if (!this.nextGame.timer)
+            this.nextGame.timer = {};
+        this.nextGame.timer.set = Math.min(60, Math.max(10, seconds));
     }
 
-    reachedTimeLimit() {
-        return this.originalGame.next.deadline && this.originalGame.next.timeleft && this.originalGame.next.timeleft > 0;
+    reachedTimelimit() {
+        if (typeof this.msg.timeleft == 'undefined')
+            return false;
+        return this.msg.timeleft <= 0;
     }
 
     event(name) {

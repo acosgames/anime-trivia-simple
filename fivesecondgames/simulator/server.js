@@ -14,6 +14,7 @@ var userCount = 0;
 var clients = {};
 var gameHistory = [];
 var worker = createWorker(1);
+var locked = { seq: 0 };
 
 function getLastGame() {
     if (gameHistory.length > 0)
@@ -52,6 +53,8 @@ io.on('connection', (socket) => {
     })
 
     socket.on('action', (msg) => {
+        console.time('[ActionLoop]')
+        console.time('[SocketOnAction]')
         msg.user = socket.user;
         // msg.userid = socket.user.userid;
         if (msg && msg.type) {
@@ -71,6 +74,11 @@ io.on('connection', (socket) => {
             }
             else {
                 if (msg.type == 'skip') {
+                    if (locked.seq == lastGame.timer.seq) {
+                        return;
+                    }
+
+                    locked.seq = lastGame.timer.seq;
 
                 }
                 else if (lastGame) {
@@ -79,29 +87,10 @@ io.on('connection', (socket) => {
                 }
             }
 
-            if (lastGame) {
-                let deadline = lastGame.timer.deadline;
-                let now = (new Date()).getTime();
-                let timeleft = deadline - now;
-                if (msg.type == 'skip') {
-                    if (now < deadline)
-                        return;
-                    msg.user = { id: lastGame.next.id }
-                    msg.payload = {
-                        timeleft
-                    }
-                }
-                else {
-                    if (!msg.payload)
-                        msg.payload = {};
-                    msg.payload.timeleft = timeleft;
-                    // msg.payload.now = now;
-                }
-            }
 
             worker.postMessage(msg);
         }
-
+        console.timeEnd('[SocketOnAction]')
     });
 
     socket.on('reload', (msg) => {
@@ -111,34 +100,17 @@ io.on('connection', (socket) => {
     })
 });
 
-function processTimelimit(timer) {
-    if (!timer || !timer.timelimit)
-        return;
 
-    let seconds = timer.timelimit;
-    seconds = Math.min(60, Math.max(10, seconds));
-
-    if (timer.timelimit > 0) {
-        let now = (new Date()).getTime();
-        let deadline = now + (seconds * 1000);
-        let timeleft = deadline - now;
-        timer.deadline = deadline;
-        timer.timeleft = timeleft;
-    }
-
-}
 
 function createWorker(index) {
     const worker = new Worker('./fivesecondgames/simulator/worker.js', { workerData: { index } });
     worker.on("message", (game) => {
-
+        console.time('[WorkerOnMessage]')
         if (!game || game.status) {
             return;
         }
 
-        if (game.next && typeof game.next.timelimit == 'number') {
-            processTimelimit(game.timer);
-        }
+
 
         console.log("Outgoing Game: ", game);
 
@@ -174,7 +146,8 @@ function createWorker(index) {
 
             return;
         }
-
+        console.timeEnd('[WorkerOnMessage]')
+        console.timeEnd('[ActionLoop]')
     });
     worker.on("online", (err) => {
 

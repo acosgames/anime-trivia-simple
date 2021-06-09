@@ -13,7 +13,7 @@ let defaultGame = {
     },
     players: {},
     rules: {
-        rounds: 10,
+        rounds: 2,
         maxplayers: 2
     },
     next: {},
@@ -28,7 +28,7 @@ class PopTrivia {
     }
 
     onSkip() {
-        if (fsg.reachedTimeLimit())
+        if (fsg.reachedTimelimit())
             this.nextRound();
     }
 
@@ -53,7 +53,7 @@ class PopTrivia {
         fsg.next({
             id: '*',
         })
-        fsg.setTimeLimit(20);
+        fsg.setTimelimit(5);
 
         this.resetPlayerChoices();
 
@@ -64,8 +64,6 @@ class PopTrivia {
         }
 
         this.processNextQuestion();
-
-        // fsg.setTimeLimit(20);
     }
 
     resetPlayerChoices() {
@@ -192,7 +190,7 @@ class PopTrivia {
 
     onPick() {
 
-        if (fsg.reachedTimeLimit()) {
+        if (fsg.reachedTimelimit()) {
             this.nextRound();
             fsg.log("Pick passed timelimit, getting new round");
             return;

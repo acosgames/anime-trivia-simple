@@ -85,20 +85,59 @@ class FSGWorker {
 
     }
 
+    processTimelimit(timer) {
+
+        if (!timer || !timer.set)
+            return;
+
+        if (typeof timer.set === 'undefined')
+            return;
+
+        let seconds = Math.min(60, Math.max(10, timer.set));
+        let sequence = timer.seq || 0;
+        let now = (new Date()).getTime();
+        let deadline = now + (seconds * 1000);
+        let timeleft = deadline - now;
+
+        timer.data = [deadline, seconds];
+        timer.seq = sequence + 1;
+        delete timer.set;
+    }
+
+    calculateTimeleft(action, game) {
+        if (!game || !game.timer || !game.timer.data)
+            return true;
+
+        let deadline = game.timer.data[0];
+        let now = (new Date()).getTime();
+        let timeleft = deadline - now;
+        if (action.type == 'skip') {
+            if (now < deadline)
+                return false;
+        }
+
+        action.timeleft = timeleft;
+        return true;
+    }
+
     async onAction(msg) {
+        console.time("[WorkerOnAction]")
         if (!msg.type) {
             console.log("Not an action: ", msg);
             return;
         }
 
+        // console.log("(1)Executing Action: ", msg);
 
         if (!globalGame)
             this.makeGame();
 
-        if (msg.payload.deadline && msg.payload.timeleft) {
-            // globalGame.timer.deadline = msg.payload.deadline;
-            globalGame.timer.timeleft = msg.payload.timeleft;
+        if (globalGame.timer) {
+            msg.seq = globalGame.timer.seq || 0;
         }
+        if (!this.calculateTimeleft(msg, globalGame))
+            return;
+
 
         if (msg.type == 'join') {
             let userid = msg.user.id;
@@ -120,20 +159,27 @@ class FSGWorker {
         else if (msg.type == 'reset') {
             this.makeGame();
         }
+        // console.log("(2)Executing Action: ", msg);
 
         globalGame = cloneObj(globalGame);
         globalAction = cloneObj(msg);
-        this.run();
-        this.storeGame(globalResult);
+        await this.run();
+
 
         if (typeof globalDone !== 'undefined' && globalDone) {
             globalResult.killGame = true;
             this.makeGame(true);
             globalDone = false;
+            this.gameHistory = [];
+        }
+        else {
+            this.processTimelimit(globalResult.timer);
+            this.storeGame(globalResult);
         }
 
-        parentPort.postMessage(globalResult);
 
+        parentPort.postMessage(globalResult);
+        console.timeEnd("[WorkerOnAction]")
     }
 
 
@@ -178,17 +224,21 @@ class FSGWorker {
             return;
         }
 
-        try {
-            profiler.Start('Game Logic');
-            {
-                vm.run(this.gameScript);
-
+        return new Promise((rs, rj) => {
+            try {
+                profiler.Start('Game Logic');
+                {
+                    vm.run(this.gameScript);
+                }
+                profiler.End('Game Logic', 100);
+                rs(true);
             }
-            profiler.End('Game Logic', 100);
-        }
-        catch (e) {
-            console.error(e);
-        }
+            catch (e) {
+                console.error(e);
+                rs(false);
+            }
+        })
+
     }
 }
 

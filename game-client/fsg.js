@@ -32,7 +32,7 @@ async function timerLoop(cb) {
     if (!timer)
         return;
 
-    let deadline = timer.deadline;
+    let deadline = timer.data[0];
     if (!deadline)
         return;
 
