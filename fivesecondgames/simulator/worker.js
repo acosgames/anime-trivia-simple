@@ -121,7 +121,7 @@ class FSGWorker {
     }
 
     async onAction(msg) {
-        console.time("[WorkerOnAction]")
+        profiler.Start("[WorkerOnAction]")
         if (!msg.type) {
             console.log("Not an action: ", msg);
             return;
@@ -173,13 +173,17 @@ class FSGWorker {
             this.gameHistory = [];
         }
         else {
-            this.processTimelimit(globalResult.timer);
-            this.storeGame(globalResult);
+            if (globalResult) {
+                this.processTimelimit(globalResult.timer);
+                this.storeGame(globalResult);
+            }
+
         }
 
-
+        profiler.End("[WorkerOnAction]")
+        var test = 1;
+        test = test * test;
         parentPort.postMessage(globalResult);
-        console.timeEnd("[WorkerOnAction]")
     }
 
 
@@ -187,7 +191,7 @@ class FSGWorker {
         profiler.Start('Reload Bundle');
         {
             filepath = filepath || this.bundlePath;
-            var data = fs.readFileSync(filepath, 'utf8');
+            var data = await fs.promises.readFile(filepath, 'utf8');
 
             this.gameScript = new VMScript(data, this.bundlePath);
         }
@@ -204,10 +208,10 @@ class FSGWorker {
         try {
             this.reloadServerBundle();
 
-            let watchPath = this.bundlePath.substr(0, this.bundlePath.lastIndexOf('/'));
+            let watchPath = this.bundlePath.substr(0, this.bundlePath.lastIndexOf(path.sep));
             chokidar.watch(watchPath).on('change', (path) => {
                 this.reloadServerBundle();
-                console.log(`${this.bundlePath} file Changed`);
+                console.log(`${this.bundlePath} file Changed`, watchPath);
             });
 
             parentPort.on('message', this.onAction.bind(this));

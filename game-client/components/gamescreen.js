@@ -6,6 +6,8 @@ import AlertPanel from './alertpanel';
 import PlayerList from './playerlist';
 import Question from './Question';
 
+import Speech from 'react-speech';
+
 class Gamescreen extends Component {
     constructor(props) {
         super(props);
@@ -34,6 +36,11 @@ class Gamescreen extends Component {
                 {/* <AlertPanel /> */}
 
                 <PlayerList />
+                {/* <Speech stop={true}
+                    pause={true}
+                    resume={true}
+                    text="Welcome to react speech"
+                    voice="Microsoft Mark - English (United States)" /> */}
                 <div className="gamescreen">
 
                     <div className="gamearea">

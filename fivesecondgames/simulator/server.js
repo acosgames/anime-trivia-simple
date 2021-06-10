@@ -87,10 +87,10 @@ io.on('connection', (socket) => {
                 }
             }
 
-
+            console.timeEnd('[SocketOnAction]')
             worker.postMessage(msg);
         }
-        console.timeEnd('[SocketOnAction]')
+
     });
 
     socket.on('reload', (msg) => {
@@ -103,7 +103,7 @@ io.on('connection', (socket) => {
 
 
 function createWorker(index) {
-    const worker = new Worker('./fivesecondgames/simulator/worker.js', { workerData: { index } });
+    const worker = new Worker('./fivesecondgames/simulator/worker.js', { workerData: { index }, });
     worker.on("message", (game) => {
         console.time('[WorkerOnMessage]')
         if (!game || game.status) {
@@ -144,7 +144,6 @@ function createWorker(index) {
                 gameHistory = [];
             }, 1000);
 
-            return;
         }
         console.timeEnd('[WorkerOnMessage]')
         console.timeEnd('[ActionLoop]')
