@@ -26,6 +26,7 @@ class Gamescreen extends Component {
         fs.set('gamearea', rect);
     }
 
+
     render() {
         return (
             <div className="gamewrapper" ref={el => {
