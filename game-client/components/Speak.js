@@ -7,20 +7,36 @@ class Speak extends Component {
         super(props);
         this.button = null;
         this.prevQuestion = null;
+        speechSynthesis.getVoices()
     }
 
     speak(text) {
 
+        fs.set('speakDone', false);
         var msg = new SpeechSynthesisUtterance();
         var voices = speechSynthesis.getVoices();
-        console.log(voices);
-        // msg.voice = voices[10];
-        // msg.voiceURI = 'native';
+
+        var englishVoices = [];
+        for (var i = 0; i < voices.length; i++) {
+            let voice = voices[i];
+            if (voice.lang == 'en-US')
+                englishVoices.push(voice);
+        }
+        console.log(englishVoices);
+        msg.voice = englishVoices[0];
+
+        text = text.replace(/\&[^;]*;/ig, "");
+        //msg.voiceURI = englishVoices[0].voiceURI;
         msg.volume = 1;
         msg.rate = 1;
-        msg.pitch = 2;
+        msg.pitch = 1;
         msg.text = text;
-        msg.lang = 'en-US';
+        // msg.lang = 'en-US';
+        msg.onend = (event) => {
+            fs.set('speakDone', true);
+            if (this.props.onEnd)
+                this.props.onEnd(event)
+        }
 
         speechSynthesis.speak(msg);
     }
@@ -30,18 +46,21 @@ class Speak extends Component {
         // if (!speakReady) {
         //     return (<React.Fragment></React.Fragment>)
         // }
-        let curQuestion = this.props['state-question'];
+        let curQuestion = this.props['speakText'];
         if (curQuestion == this.prevQuestion) {
-            return (<React.Fragment></React.Fragment>);
+            return (<div>
+                <button
+                    onClick={() => { }}
+                    ref={el => {
+                        this.button = el;
+                    }}></button>
+            </div >);
         }
 
         this.prevQuestion = curQuestion;
-        setTimeout(() => {
-            if (!this.button)
-                return;
-            this.button.click();
-            this.speak(curQuestion);
-        }, 1000)
+
+        this.speak(curQuestion);
+
 
 
         return (
@@ -51,10 +70,10 @@ class Speak extends Component {
                     ref={el => {
                         this.button = el;
                     }}></button>
-            </div>
+            </div >
         )
     }
 
 }
 
-export default fs.connect(['state-question', 'speakReady'])(Speak);
+export default fs.connect(['speakText', 'speakReady'])(Speak);

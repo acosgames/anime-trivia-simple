@@ -53,7 +53,7 @@ class PopTrivia {
         fsg.next({
             id: '*',
         })
-        fsg.setTimelimit(5);
+        fsg.setTimelimit(60);
 
         this.resetPlayerChoices();
 

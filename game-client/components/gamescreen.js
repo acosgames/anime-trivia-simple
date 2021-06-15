@@ -8,6 +8,8 @@ import Question from './Question';
 
 import Speech from 'react-speech';
 
+fs.set('userActivation', false);
+
 class Gamescreen extends Component {
     constructor(props) {
         super(props);
@@ -28,6 +30,10 @@ class Gamescreen extends Component {
 
 
     render() {
+        let userActivation = fs.get('userActivation');
+        if (!userActivation) {
+            return (<button className="userActivation" onClick={() => { fs.set('userActivation', true); }}>Play!</button>)
+        }
         return (
             <div className="gamewrapper" ref={el => {
                 if (!el) return;
@@ -56,4 +62,4 @@ class Gamescreen extends Component {
 
 }
 
-export default Gamescreen;
+export default fs.connect(['userActivation'])(Gamescreen);
