@@ -24,17 +24,13 @@ class Question extends Component {
         this.speakStage = 0;
     }
 
-
-
-
     render() {
         let question = this.props['state-question'];
 
-        if (this.prevQuestion == question)
-            return;
+        // if (this.prevQuestion == question)
+        //     return <React.Fragment></React.Fragment>;
 
         this.speakStage = 0;
-        this.prevQuestion = question;
 
         let state = fs.get('state');
         let choices = state.choices;
@@ -44,12 +40,21 @@ class Question extends Component {
 
 
         let choicesText = choices.map((choice, index) => {
-            return ((index == choices.length - 1) ? 'or ' : '') + choiceTable[index] + ', ' + choice;
+            let alpha = + choiceTable[index] + ', ';
+            alpha = '';
+            return ((index == choices.length - 1) ? 'or ' : '') + alpha + choice;
         });
 
         // setTimeout(() => { this.speak(question); }, 1000)
-        fs.set('speakText', question);
-        fs.set('speakStage', 0);
+        if (this.prevQuestion != question) {
+            speechSynthesis.cancel();
+            fs.set('speakText', question);
+            fs.set('speakStage', 0);
+        }
+
+        this.prevQuestion = question;
+
+
         return (
             <div className="question">
                 <Skip></Skip>
@@ -71,7 +76,7 @@ class Question extends Component {
 
                 {choices.map((choice, index) =>
                 (
-                    <QuestionChoice id={index} choiceText={choiceTable[index] + ') ' + choice}></QuestionChoice>
+                    <QuestionChoice key={'qc-' + index} id={index} choiceText={choiceTable[index] + ') ' + choice}></QuestionChoice>
 
                 )
                 )}

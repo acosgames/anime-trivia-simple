@@ -16,16 +16,20 @@ class QuestionChoice extends Component {
     }
 
     render() {
+        let timeleft = fs.get('timeleft');
+        let timer = fs.get('timer');
+        let maxTime = timer[1];
         let speakStage = this.props.speakStage - 1;
-        if (speakStage < this.props.id)
+        if (speakStage < this.props.id && timeleft > maxTime - 15)
             return <React.Fragment></React.Fragment>
+        let id = 'q' + this.props.id;
         return (
-            <div id={'q' + this.props.id} className="question-choice">
+            <div key={id} id={id} className="question-choice">
 
                 <button
                     dangerouslySetInnerHTML={{ __html: this.props.choiceText }}
                     onClick={() => {
-                        this.selectChoice(index)
+                        this.selectChoice(this.props.id)
                     }}>
                 </button>
 

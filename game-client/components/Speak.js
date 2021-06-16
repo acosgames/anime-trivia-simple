@@ -7,11 +7,18 @@ class Speak extends Component {
         super(props);
         this.button = null;
         this.prevQuestion = null;
+        this.voicesExist = false;
         speechSynthesis.getVoices()
+        speechSynthesis.onvoiceschanged = () => {
+            this.voicesExist = true;
+        }
     }
 
     speak(text) {
-
+        if (!this.voicesExist) {
+            setTimeout(() => { this.speak(text) }, 1000);
+            return;
+        }
         fs.set('speakDone', false);
         var msg = new SpeechSynthesisUtterance();
         var voices = speechSynthesis.getVoices();
@@ -23,7 +30,7 @@ class Speak extends Component {
                 englishVoices.push(voice);
         }
         console.log(englishVoices);
-        msg.voice = englishVoices[0];
+        msg.voice = englishVoices[1];
 
         text = text.replace(/\&[^;]*;/ig, "");
         //msg.voiceURI = englishVoices[0].voiceURI;
@@ -31,7 +38,7 @@ class Speak extends Component {
         msg.rate = 1;
         msg.pitch = 1;
         msg.text = text;
-        // msg.lang = 'en-US';
+        msg.lang = msg.voice.lang;
         msg.onend = (event) => {
             fs.set('speakDone', true);
             if (this.props.onEnd)
@@ -48,14 +55,9 @@ class Speak extends Component {
         // }
         let curQuestion = this.props['speakText'];
         if (curQuestion == this.prevQuestion) {
-            return (<div>
-                <button
-                    onClick={() => { }}
-                    ref={el => {
-                        this.button = el;
-                    }}></button>
-            </div >);
+            return (<React.Fragment></React.Fragment>);
         }
+
 
         this.prevQuestion = curQuestion;
 
@@ -64,13 +66,7 @@ class Speak extends Component {
 
 
         return (
-            <div>
-                <button
-                    onClick={() => { }}
-                    ref={el => {
-                        this.button = el;
-                    }}></button>
-            </div >
+            <React.Fragment></React.Fragment>
         )
     }
 
