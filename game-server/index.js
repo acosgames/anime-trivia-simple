@@ -3,10 +3,10 @@ import PopTrivia from './game';
 
 
 
-fsg.on('newgame', () => PopTrivia.onNewGame());
-fsg.on('skip', () => PopTrivia.onSkip());
-fsg.on('join', () => PopTrivia.onJoin());
-fsg.on('leave', () => PopTrivia.onLeave());
-fsg.on('pick', () => PopTrivia.onPick());
+fsg.on('newgame', (action) => PopTrivia.onNewGame(action));
+fsg.on('skip', (action) => PopTrivia.onSkip(action));
+fsg.on('join', (action) => PopTrivia.onJoin(action));
+fsg.on('leave', (action) => PopTrivia.onLeave(action));
+fsg.on('pick', (action) => PopTrivia.onPick(action));
 
 fsg.submit();

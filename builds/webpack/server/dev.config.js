@@ -11,7 +11,9 @@ module.exports = {
     output: {
         path: OUTPUT_PATH,
         filename: 'server.bundle.js',
-        devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]'
+        devtoolModuleFilenameTemplate: function(info) {
+            return "../../"+info.resourcePath
+        }
     },
     devtool: "inline-source-map",
     mode: 'development',

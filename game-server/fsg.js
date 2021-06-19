@@ -1,9 +1,21 @@
 
 class FSG {
-    constructor() {
-        this.msg = JSON.parse(JSON.stringify(globals.action()));
-        this.originalGame = JSON.parse(JSON.stringify(globals.game()));
-        this.nextGame = JSON.parse(JSON.stringify(globals.game()));
+    constructor() { 
+        try {
+            this.actions = JSON.parse(JSON.stringify(globals.action()));
+        }
+        catch(e) {this.error('Failed to load actions'); return}
+        try {
+            this.originalGame = JSON.parse(JSON.stringify(globals.game()));
+        }
+        catch(e) {this.error('Failed to load originalGame'); return}
+        try {
+            this.nextGame = JSON.parse(JSON.stringify(globals.game()));
+        }
+        catch(e) {this.error('Failed to load nextGame'); return}
+        
+        
+       
         this.isNewGame = false;
         this.markedForDelete = false;
         this.defaultSeconds = 15;
@@ -49,16 +61,21 @@ class FSG {
     }
 
     on(type, cb) {
-        if (this.msg.type != type) {
-            if (type == 'newgame' && this.isNewGame) {
-                cb(this.msg);
+        if( this.actions.length == 1 ) {
+            if (this.actions[0].type != type) {
+                if (type == 'newgame' && this.isNewGame) {
+                    cb(this.actions[0]);
 
-                // this.nextGame = Object.assign({}, defaultGame, { players: this.nextGame.players })
+                    // this.nextGame = Object.assign({}, defaultGame, { players: this.nextGame.players })
+                }
+                return;
             }
-            return;
         }
 
-        cb(this.msg);
+        for( var i=0; i<this.actions.length; i++) {
+            cb(this.actions[i]);
+        }
+        
     }
 
     setGame(game) {
@@ -106,9 +123,13 @@ class FSG {
         this.kickedPlayers.push(id);
     }
 
-    action() {
-        return this.msg;
+    database() {
+        return globals.database();
     }
+
+    // action() {
+    //     return this.msg;
+    // }
 
     state(key, value) {
 
@@ -166,10 +187,10 @@ class FSG {
         this.nextGame.timer.set = Math.min(60, Math.max(10, seconds));
     }
 
-    reachedTimelimit() {
-        if (typeof this.msg.timeleft == 'undefined')
+    reachedTimelimit(action) {
+        if (typeof action.timeleft == 'undefined')
             return false;
-        return this.msg.timeleft <= 0;
+        return action.timeleft <= 0;
     }
 
     event(name) {

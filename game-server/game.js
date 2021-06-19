@@ -1,6 +1,6 @@
 import fsg from './fsg';
 
-import questions from './questions';
+let questions = fsg.database();
 
 let defaultGame = {
     state: {
@@ -22,13 +22,13 @@ let defaultGame = {
 
 class PopTrivia {
 
-    onNewGame() {
+    onNewGame(action) {
         fsg.setGame(defaultGame);
         this.checkStartGame();
     }
 
-    onSkip() {
-        if (fsg.reachedTimelimit())
+    onSkip(action) {
+        //if (fsg.reachedTimelimit(action))
             this.nextRound();
     }
 
@@ -53,7 +53,7 @@ class PopTrivia {
         fsg.next({
             id: '*',
         })
-        fsg.setTimelimit(60);
+        fsg.setTimelimit(20);
 
         this.resetPlayerChoices();
 
@@ -164,8 +164,7 @@ class PopTrivia {
         }
     }
 
-    onJoin() {
-        let action = fsg.action();
+    onJoin(action) {
         if (!action.user.id)
             return;
 
@@ -181,23 +180,23 @@ class PopTrivia {
 
 
 
-    onLeave() {
+    onLeave(action) {
+        let id = action.user.id;
         let players = fsg.players();
         if (players[id]) {
             delete players[id];
         }
     }
 
-    onPick() {
+    onPick(action) {
 
-        if (fsg.reachedTimelimit()) {
-            this.nextRound();
-            fsg.log("Pick passed timelimit, getting new round");
-            return;
-        }
+        // if (fsg.reachedTimelimit(action)) {
+        //     this.nextRound();
+        //     fsg.log("Pick passed timelimit, getting new round");
+        //     return;
+        // }
 
         let state = fsg.state();
-        let action = fsg.action();
         let user = fsg.players(action.user.id);
 
         //get the picked cell
