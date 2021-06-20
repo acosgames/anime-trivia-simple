@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import fs from 'flatstore';
 
-import Skip from './skip';
 import Speak from './Speak';
 import QuestionText from './QuestionText';
 import QuestionChoice from './QuestionChoice';
@@ -22,19 +21,40 @@ class Question extends Component {
 
         this.prevQuestion = null;
         this.speakStage = 0;
+
+        fs.subscribe('state-question', this.onQuestionChange.bind(this));
+
+        this.state = { question: '' };
+    }
+
+    onQuestionChange() {
+        let question = this.props['state-question'];
+        if (this.prevQuestion != question) {
+            speechSynthesis.cancel();
+            fs.set('speakText', question);
+            fs.set('speakStage', 0);
+        }
+
+        this.prevQuestion = question;
+
+        this.setState({ question });
     }
 
     render() {
-        let question = this.props['state-question'];
 
+        let state = fs.get('state');
+        let round = fs.get('state-round');
+        let maxRounds = fs.get('rules-rounds');
         // if (this.prevQuestion == question)
         //     return <React.Fragment></React.Fragment>;
 
+        let question = this.state.question;
+
         this.speakStage = 0;
 
-        let state = fs.get('state');
+
         let choices = state.choices;
-        if (!choices) {
+        if (!choices || round > maxRounds) {
             return (<React.Fragment></React.Fragment>)
         }
 
@@ -46,18 +66,14 @@ class Question extends Component {
         });
 
         // setTimeout(() => { this.speak(question); }, 1000)
-        if (this.prevQuestion != question) {
-            speechSynthesis.cancel();
-            fs.set('speakText', question);
-            fs.set('speakStage', 0);
-        }
 
-        this.prevQuestion = question;
+
+
 
 
         return (
             <div className="question">
-                <Skip></Skip>
+                {/* <Skip></Skip> */}
                 <Speak
                     onEnd={() => {
                         if (this.speakStage == 0) {
@@ -72,7 +88,7 @@ class Question extends Component {
 
                     }}>
                 </Speak>
-                <QuestionText></QuestionText>
+                <QuestionText question={question}></QuestionText>
 
                 {choices.map((choice, index) =>
                 (

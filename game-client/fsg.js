@@ -32,7 +32,7 @@ async function timerLoop(cb) {
     if (!timer)
         return;
 
-    let deadline = timer.data[0];
+    let deadline = timer.end;
     if (!deadline)
         return;
 
@@ -66,9 +66,7 @@ export async function attachMessageEvent() {
         if (message.timer) {
             fs.set('timer', message.timer);
         }
-        if (message.state) {
-            fs.set('state', message.state);
-        }
+
         if (message.players) {
             fs.set('players', message.players);
         }
@@ -81,6 +79,11 @@ export async function attachMessageEvent() {
         if (message.prev) {
             fs.set('prev', message.prev);
         }
+
+        if (message.state) {
+            fs.set('state', message.state);
+        }
+
         if (message.events) {
             let eventMap = {}
             message.events.forEach(v => { eventMap[v] = true })

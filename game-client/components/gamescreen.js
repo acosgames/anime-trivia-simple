@@ -6,7 +6,7 @@ import AlertPanel from './alertpanel';
 import PlayerList from './playerlist';
 import Question from './Question';
 
-import Speech from 'react-speech';
+import WinScreen from './WinScreen';
 
 fs.set('userActivation', false);
 
@@ -52,6 +52,7 @@ class Gamescreen extends Component {
 
                     <div className="gamearea">
                         <Question></Question>
+                        <WinScreen></WinScreen>
                     </div>
 
                 </div>

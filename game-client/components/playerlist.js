@@ -3,63 +3,44 @@ import React, { Component } from 'react';
 
 import fs from 'flatstore';
 import Timeleft from './timeleft';
-import Skip from './skip';
 
 class PlayerList extends Component {
     constructor(props) {
         super(props);
     }
 
+    createPlayer(player) {
+        return (
+            <li key={player.id}>
+                <h2><span className="username">{player.name}</span> {player.points || 0}</h2>
+            </li>
+        )
+    }
+
     renderPlayers() {
         //not initialized yet
-        if (!this.props.players) {
-            return (<React.Fragment></React.Fragment>)
-        }
 
-        //don't draw if no player exists
-        let playerids = Object.keys(this.props.players);
-        if (playerids.length == 0) {
-            return (<React.Fragment></React.Fragment>)
-        }
 
         //draw local player name
         let local = fs.get('local');
-        let players = [];
-        let nextUserId = fs.get('next-id');
+        let players = fs.get('players');
 
-        let nextTag = nextUserId == local.id ? " > " : "";
-        let type = local.type || '';
-        let color = ''
-        if (type.length > 0) {
-            color = "color-" + type;
-            type = 'You are ' + type.toUpperCase();
-        } else {
-            type = local.name + ' (you)';
+        if (!players) {
+            return (<React.Fragment></React.Fragment>)
         }
 
+        let playerList = [];
 
-        players.push(<li key={local.id}>
-            <h2 className={color}><span className="nextTag">{nextTag}</span><span className="ttt-type">{type}</span></h2>
-        </li>)
+        playerList.push(this.createPlayer(local));
 
-        //draw other players
-        for (var id in this.props.players) {
-            if (local.id == id)
+        for (var id in players) {
+            let player = players[id];
+            if (player.name == local.name)
                 continue;
-            let player = this.props.players[id];
-            nextTag = nextUserId == id ? " > " : "";
-            type = player.type || '';
-            let color = "color-" + type;
-            if (type.length > 0) {
-                type = 'is ' + type.toUpperCase();
-            }
-            players.push(
-                <li key={id}>
-                    <h3 className={color}><span className="nextTag">{nextTag}</span>{player.name} <span className="ttt-type">{type}</span></h3>
-                </li>
-            )
+            playerList.push(this.createPlayer(player))
         }
-        return players;
+
+        return playerList;
     }
 
     render() {

@@ -9,7 +9,7 @@ class QuestionText extends Component {
 
 
     render() {
-        let question = fs.get('state-question');
+        let question = this.props.question;
         return (
             <div className="question-choice" dangerouslySetInnerHTML={{ __html: question }}>
             </div>
@@ -19,4 +19,4 @@ class QuestionText extends Component {
 
 }
 
-export default fs.connect(['speakStage', ''])(QuestionText);
+export default fs.connect([])(QuestionText);

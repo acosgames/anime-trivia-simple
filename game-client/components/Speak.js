@@ -8,7 +8,7 @@ class Speak extends Component {
         this.button = null;
         this.prevQuestion = null;
         this.voicesExist = false;
-        speechSynthesis.getVoices()
+        this.voices = speechSynthesis.getVoices()
         speechSynthesis.onvoiceschanged = () => {
             this.voicesExist = true;
         }
@@ -21,11 +21,12 @@ class Speak extends Component {
         }
         fs.set('speakDone', false);
         var msg = new SpeechSynthesisUtterance();
-        var voices = speechSynthesis.getVoices();
+        if (!this.voices || this.voices.length == 0)
+            this.voices = speechSynthesis.getVoices();
 
         var englishVoices = [];
-        for (var i = 0; i < voices.length; i++) {
-            let voice = voices[i];
+        for (var i = 0; i < this.voices.length; i++) {
+            let voice = this.voices[i];
             if (voice.lang == 'en-US')
                 englishVoices.push(voice);
         }
@@ -54,7 +55,7 @@ class Speak extends Component {
         //     return (<React.Fragment></React.Fragment>)
         // }
         let curQuestion = this.props['speakText'];
-        if (curQuestion == this.prevQuestion) {
+        if (curQuestion == this.prevQuestion || curQuestion == '') {
             return (<React.Fragment></React.Fragment>);
         }
 

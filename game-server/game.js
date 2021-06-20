@@ -20,6 +20,8 @@ let defaultGame = {
     events: []
 }
 
+
+
 class PopTrivia {
 
     onNewGame(action) {
@@ -29,8 +31,56 @@ class PopTrivia {
 
     onSkip(action) {
         //if (fsg.reachedTimelimit(action))
-            this.nextRound();
+        this.nextRound();
     }
+
+    onJoin(action) {
+        if (!action.user.id)
+            return;
+
+        let user = fsg.players(action.user.id);
+        if (!user)
+            return;
+
+        //new player defaults
+        user.points = 0;
+
+        this.checkStartGame();
+    }
+
+
+
+    onLeave(action) {
+        let id = action.user.id;
+        let players = fsg.players();
+        if (players[id]) {
+            delete players[id];
+        }
+    }
+
+    onPick(action) {
+
+        // if (fsg.reachedTimelimit(action)) {
+        //     this.nextRound();
+        //     fsg.log("Pick passed timelimit, getting new round");
+        //     return;
+        // }
+
+        let state = fsg.state();
+        let user = fsg.players(action.user.id);
+
+        //get the picked cell
+        let choice = action.payload.choice;
+
+        if (choice < 0 || choice > state.choices.length)
+            return;
+
+        user._choice = choice;
+
+        fsg.event('picked');
+        state.picked = user.id;
+    }
+
 
     checkStartGame() {
         //if player count reached required limit, start the game
@@ -53,7 +103,7 @@ class PopTrivia {
         fsg.next({
             id: '*',
         })
-        fsg.setTimelimit(20);
+        fsg.setTimelimit(5);
 
         this.resetPlayerChoices();
 
@@ -70,7 +120,10 @@ class PopTrivia {
         let players = fsg.players();
         for (var id in players) {
             let player = players[id];
-            player.choice = null;
+            player.choices = player.choices || [];
+            if (typeof player._choice !== 'undefined' && player._choice != null)
+                player.choices.push(player._choice);
+            delete player._choice;
         }
     }
 
@@ -119,7 +172,7 @@ class PopTrivia {
 
         //sort all players by their points
         playerList.sort((a, b) => {
-            b.points - a.points;
+            a.points - b.points;
         })
 
         //get the top 10
@@ -150,11 +203,11 @@ class PopTrivia {
         //award points for correct choices, remove points for wrong choices
         for (var id in players) {
             let player = players[id];
-            if (typeof player.choice == 'undefined' || player.choice == null)
+            if (typeof player._choice == 'undefined' || player._choice == null)
                 continue;
 
             let answer = questions[state.qid].a;
-            let userChoice = state.choices[player.choice];
+            let userChoice = state.choices[player._choice];
             if (answer == userChoice) {
                 player.points += 10;
             }
@@ -164,52 +217,6 @@ class PopTrivia {
         }
     }
 
-    onJoin(action) {
-        if (!action.user.id)
-            return;
-
-        let user = fsg.players(action.user.id);
-        if (!user)
-            return;
-
-        //new player defaults
-        user.points = 0;
-
-        this.checkStartGame();
-    }
-
-
-
-    onLeave(action) {
-        let id = action.user.id;
-        let players = fsg.players();
-        if (players[id]) {
-            delete players[id];
-        }
-    }
-
-    onPick(action) {
-
-        // if (fsg.reachedTimelimit(action)) {
-        //     this.nextRound();
-        //     fsg.log("Pick passed timelimit, getting new round");
-        //     return;
-        // }
-
-        let state = fsg.state();
-        let user = fsg.players(action.user.id);
-
-        //get the picked cell
-        let choice = action.payload.choice;
-
-        if (choice < 0 || choice > state.choices.length)
-            return;
-
-        user.choice = choice;
-
-        fsg.event('picked');
-        state.picked = user.id;
-    }
 
 }
 

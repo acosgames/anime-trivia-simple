@@ -6,7 +6,7 @@ var OUTPUT_PATH = '../../../builds/client';
 
 module.exports = {
     mode: 'production',
-    devtool: 'inline-source-map',
+    devtool: false,
     entry: { main: ENTRY_FILE },
     output: {
         path: path.resolve(__dirname, OUTPUT_PATH),
