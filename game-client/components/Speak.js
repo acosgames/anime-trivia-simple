@@ -12,6 +12,17 @@ class Speak extends Component {
         speechSynthesis.onvoiceschanged = () => {
             this.voicesExist = true;
         }
+
+        fs.subscribe('speakText', this.onSpeakText);
+    }
+
+    onSpeakText = () => {
+        let curQuestion = fs.get('speakText');
+        if (curQuestion == this.prevQuestion || curQuestion == '') {
+            return;
+        }
+        this.prevQuestion = curQuestion;
+        this.speak(curQuestion);
     }
 
     speak(text) {
@@ -50,22 +61,6 @@ class Speak extends Component {
     }
 
     render() {
-        // let speakReady = this.props.speakReady;
-        // if (!speakReady) {
-        //     return (<React.Fragment></React.Fragment>)
-        // }
-        let curQuestion = this.props['speakText'];
-        if (curQuestion == this.prevQuestion || curQuestion == '') {
-            return (<React.Fragment></React.Fragment>);
-        }
-
-
-        this.prevQuestion = curQuestion;
-
-        this.speak(curQuestion);
-
-
-
         return (
             <React.Fragment></React.Fragment>
         )

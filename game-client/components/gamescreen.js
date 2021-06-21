@@ -31,15 +31,15 @@ class Gamescreen extends Component {
 
     render() {
         let userActivation = fs.get('userActivation');
-        if (!userActivation) {
-            return (<button className="userActivation" onClick={() => { fs.set('userActivation', true); }}>Play!</button>)
-        }
+
         return (
             <div className="gamewrapper" ref={el => {
                 if (!el) return;
                 this.ref = el;
                 setTimeout(this.updatePosition.bind(this), 2000);
             }}>
+
+                {!userActivation && (<button className="userActivation" onClick={() => { fs.set('userActivation', true); }}>Play!</button>)}
                 {/* <AlertPanel /> */}
 
                 <PlayerList />

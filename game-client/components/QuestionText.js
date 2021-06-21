@@ -7,16 +7,15 @@ class QuestionText extends Component {
         super(props);
     }
 
-
     render() {
         let question = this.props.question;
         return (
-            <div className="question-choice" dangerouslySetInnerHTML={{ __html: question }}>
+            <div
+                className="question-choice"
+                dangerouslySetInnerHTML={{ __html: question }}>
             </div>
-
         )
     }
-
 }
 
 export default fs.connect([])(QuestionText);

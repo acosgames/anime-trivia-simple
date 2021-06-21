@@ -39,4 +39,4 @@ class QuestionChoice extends Component {
 
 }
 
-export default fs.connect(['speakStage', ''])(QuestionChoice);
+export default fs.connect(['speakStage'])(QuestionChoice);

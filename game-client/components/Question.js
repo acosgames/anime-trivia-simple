@@ -23,85 +23,76 @@ class Question extends Component {
         this.speakStage = 0;
 
         fs.subscribe('state-question', this.onQuestionChange.bind(this));
-
-        this.state = { question: '' };
+        let question = fs.get('state-question') || '';
+        //fs.set('state-question', question);
+        this.state = { question };
     }
 
     onQuestionChange() {
-        let question = this.props['state-question'];
+        let question = fs.get('state-question');
+        if (!question || question.length == 0)
+            return;
+
         if (this.prevQuestion != question) {
             speechSynthesis.cancel();
             fs.set('speakText', question);
             fs.set('speakStage', 0);
         }
 
-        this.prevQuestion = question;
-
-        this.setState({ question });
-    }
-
-    render() {
-
-        let state = fs.get('state');
-        let round = fs.get('state-round');
-        let maxRounds = fs.get('rules-rounds');
-        // if (this.prevQuestion == question)
-        //     return <React.Fragment></React.Fragment>;
-
-        let question = this.state.question;
-
-        this.speakStage = 0;
-
-
-        let choices = state.choices;
-        if (!choices || round > maxRounds) {
-            return (<React.Fragment></React.Fragment>)
-        }
-
-
-        let choicesText = choices.map((choice, index) => {
+        let choices = fs.get('state-choices');
+        this.choicesText = choices.map((choice, index) => {
             let alpha = + choiceTable[index] + ', ';
             alpha = '';
             return ((index == choices.length - 1) ? 'or ' : '') + alpha + choice;
         });
 
-        // setTimeout(() => { this.speak(question); }, 1000)
+        this.prevQuestion = question;
 
+        this.setState({ question });
+    }
 
+    onSpeakEnd() {
+        let round = fs.get('state-round');
+        let maxRounds = fs.get('rules-rounds');
 
+        let choices = fs.get('state-choices');
+        if (!choices || round > maxRounds) {
+            return;
+        }
+
+        if (this.speakStage == 0) {
+            fs.set('speakText', "Is it");
+        }
+        else if (this.speakStage <= this.choicesText.length) {
+            fs.set('speakText', this.choicesText[this.speakStage - 1]);
+        }
+
+        fs.set('speakStage', this.speakStage);
+        this.speakStage++;
+    }
+
+    render() {
+        let choices = fs.get('state-choices');
+        let round = fs.get('state-round');
+        let maxRounds = fs.get('rules-rounds');
+        let question = this.state.question;
+        this.speakStage = 0;
+
+        if (!choices || round > maxRounds) {
+            return (<React.Fragment></React.Fragment>)
+        }
 
 
         return (
             <div className="question">
-                {/* <Skip></Skip> */}
-                <Speak
-                    onEnd={() => {
-                        if (this.speakStage == 0) {
-                            fs.set('speakText', "Is it");
-                        }
-                        else if (this.speakStage <= choicesText.length) {
-                            fs.set('speakText', choicesText[this.speakStage - 1]);
-                        }
-
-                        fs.set('speakStage', this.speakStage);
-                        this.speakStage++;
-
-                    }}>
-                </Speak>
+                <Speak onEnd={this.onSpeakEnd}></Speak>
                 <QuestionText question={question}></QuestionText>
-
-                {choices.map((choice, index) =>
-                (
+                {choices.map((choice, index) => (
                     <QuestionChoice key={'qc-' + index} id={index} choiceText={choiceTable[index] + ') ' + choice}></QuestionChoice>
-
-                )
-                )}
-
+                ))}
             </div>
-
         )
     }
-
 }
 
-export default fs.connect(['state-question'])(Question);
+export default fs.connect([])(Question);

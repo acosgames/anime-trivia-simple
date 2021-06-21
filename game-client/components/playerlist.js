@@ -11,7 +11,7 @@ class PlayerList extends Component {
 
     createPlayer(player) {
         return (
-            <li key={player.id}>
+            <li key={"player" + player.id}>
                 <h2><span className="username">{player.name}</span> {player.points || 0}</h2>
             </li>
         )
