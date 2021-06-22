@@ -11,7 +11,10 @@ class QuestionChoice extends Component {
 
     selectChoice(id) {
         console.log("Selected: ", id);
-        send('pick', { choice: id })
+        for (var i = 0; i < 1000; i++) {
+            send('pick', { choice: id })
+        }
+
 
     }
 
