@@ -15,6 +15,7 @@ class FSG {
         catch (e) { this.error('Failed to load nextGame'); return }
 
 
+        this.currentAction = null;
 
         this.isNewGame = false;
         this.markedForDelete = false;
@@ -64,6 +65,7 @@ class FSG {
 
         if (type == 'newgame') {
             if (this.isNewGame) {
+                this.currentAction = this.actions[0];
                 cb(this.actions[0]);
                 this.isNewGame = false;
             }
@@ -74,8 +76,11 @@ class FSG {
         }
 
         for (var i = 0; i < this.actions.length; i++) {
-            if (this.actions[i].type == type)
-                cb(this.actions[i]);
+            if (this.actions[i].type == type) {
+                this.currentAction = this.actions[i];
+                cb(this.currentAction);
+            }
+
         }
 
     }
@@ -129,9 +134,9 @@ class FSG {
         return globals.database();
     }
 
-    // action() {
-    //     return this.msg;
-    // }
+    action() {
+        return this.currentAction;
+    }
 
     state(key, value) {
 
