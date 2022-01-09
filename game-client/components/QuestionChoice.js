@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import fs from 'flatstore';
 
-import { send } from '../fsg';
+import { send } from '../acosg';
 
 class QuestionChoice extends Component {
     constructor(props) {

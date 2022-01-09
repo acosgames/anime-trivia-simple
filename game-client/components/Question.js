@@ -72,9 +72,12 @@ class Question extends Component {
     }
 
     render() {
-        let choices = fs.get('state-choices');
-        let round = fs.get('state-round');
-        let maxRounds = fs.get('rules-rounds');
+        let state = fs.get('state');
+        let rules = fs.get('rules');
+
+        let choices = state.choices;
+        let round = state.round;
+        let maxRounds = rules.rounds;
         let question = this.state.question;
         this.speakStage = 0;
 
@@ -95,4 +98,4 @@ class Question extends Component {
     }
 }
 
-export default fs.connect([])(Question);
+export default fs.connect(['state-qid'])(Question);

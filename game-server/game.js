@@ -1,6 +1,6 @@
-import fsg from './fsg';
+import cup from './acosg';
 
-let questions = fsg.database();
+let questions = cup.database();
 
 let defaultGame = {
     state: {
@@ -9,7 +9,8 @@ let defaultGame = {
         category: '',
         question: '',
         choices: [],
-        round: 0
+        round: 0,
+        stage: 0
     },
     players: {},
     rules: {
@@ -25,34 +26,62 @@ let defaultGame = {
 class PopTrivia {
 
     onNewGame(action) {
-        fsg.setGame(defaultGame);
-        this.checkStartGame();
+        cup.setGame(defaultGame);
+        this.startGame();
+    }
+
+    startGame() {
+        let players = cup.players();
+        for (var id in players)
+            players[id].points = 0;
+
+        this.nextRound();
     }
 
     onSkip(action) {
-        //if (fsg.reachedTimelimit(action))
-        this.nextRound();
+
+        let state = cup.state();
+        let stage = state.stage || 0;
+
+        switch (state.stage) {
+            case 0:
+                stage += 1;
+                cup.next({
+                    id: '*',
+                })
+                this.processNextQuestion();
+                cup.setTimelimit(60);
+                break;
+            case 1:
+                stage += 1;
+                cup.setTimelimit(15);
+                break;
+            default:
+                this.nextRound();
+                break;
+        }
+        //if (cup.reachedTimelimit(action))
+
     }
 
     onJoin(action) {
         if (!action.user.id)
             return;
 
-        let user = fsg.players(action.user.id);
+        let user = cup.players(action.user.id);
         if (!user)
             return;
 
         //new player defaults
         user.points = 0;
 
-        this.checkStartGame();
     }
 
 
 
     onLeave(action) {
         let id = action.user.id;
-        let players = fsg.players();
+        let players = cup.players();
         if (players[id]) {
             delete players[id];
         }
@@ -60,14 +89,14 @@ class PopTrivia {
 
     onPick(action) {
 
-        // if (fsg.reachedTimelimit(action)) {
+        // if (cup.reachedTimelimit(action)) {
         //     this.nextRound();
-        //     fsg.log("Pick passed timelimit, getting new round");
+        //     cup.log("Pick passed timelimit, getting new round");
         //     return;
         // }
 
-        let state = fsg.state();
-        let user = fsg.players(action.user.id);
+        let state = cup.state();
+        let user = cup.players(action.user.id);
 
         //get the picked cell
         let choice = action.payload.choice;
@@ -77,47 +106,48 @@ class PopTrivia {
 
         user._choice = choice;
 
-        fsg.event('picked');
+        cup.event('picked');
         state.picked = user.id;
-    }
 
+        let voted = 0;
+        let playerList = cup.playerList();
+        for (var id of playerList) {
+            let player = cup.players(id);
+            if (player._choice) {
+                voted++;
+            }
+        }
 
-    checkStartGame() {
-        //if player count reached required limit, start the game
-        let maxPlayers = fsg.rules('maxPlayers') || 2;
-        let playerCount = fsg.playerCount();
-        if (playerCount >= maxPlayers) {
-            let players = fsg.players();
-            for (var id in players)
-                players[id].points = 0;
-
-            this.nextRound();
+        //end round
+        if (voted >= playerList.length) {
+            this.onSkip();
         }
     }
+
+
 
     nextRound() {
         this.processCorrectAnswers();
 
-        let state = fsg.state();
+        let state = cup.state();
         state.round = state.round + 1;
-        fsg.next({
-            id: '*',
-        })
-        fsg.setTimelimit(5);
+        state.stage = 0;
 
-        this.resetPlayerChoices();
-
-        let rules = fsg.rules();
+        let rules = cup.rules();
         if (state.round > rules.rounds) {
             this.processWinners();
             return;
         }
 
-        this.processNextQuestion();
+        cup.event('q', state.round);
+        cup.setTimelimit(5);
+
+        this.resetPlayerChoices();
+
     }
 
     resetPlayerChoices() {
-        let players = fsg.players();
+        let players = cup.players();
         for (var id in players) {
             let player = players[id];
             player.choices = player.choices || [];
@@ -128,7 +158,7 @@ class PopTrivia {
     }
 
     processNextQuestion() {
-        let state = fsg.state();
+        let state = cup.state();
 
         //find a random question not asked before
         let qid = Math.floor(Math.random() * questions.length);
@@ -162,7 +192,7 @@ class PopTrivia {
     processWinners() {
         let playerList = [];
         let playerIds = [];
-        let players = fsg.players();
+        let players = cup.players();
 
         //add player id into the player data
         for (var id in players) {
@@ -187,16 +217,16 @@ class PopTrivia {
             delete players[id]['id'];
         }
 
-        let state = fsg.state();
+        let state = cup.state();
         state.winners = winners;
-        fsg.events('winner');
+        cup.gameover(winners);
 
-        fsg.killGame();
+        cup.killGame();
     }
 
     processCorrectAnswers() {
-        let players = fsg.players();
-        let state = fsg.state();
+        let players = cup.players();
+        let state = cup.state();
         if (state.round <= 0)
             return;
 

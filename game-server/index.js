@@ -1,12 +1,12 @@
-import fsg from './fsg';
+import cup from './acosg';
 import PopTrivia from './game';
 
 
 
-fsg.on('newgame', (action) => PopTrivia.onNewGame(action));
-fsg.on('skip', (action) => PopTrivia.onSkip(action));
-fsg.on('join', (action) => PopTrivia.onJoin(action));
-fsg.on('leave', (action) => PopTrivia.onLeave(action));
-fsg.on('pick', (action) => PopTrivia.onPick(action));
+cup.on('gamestart', (action) => PopTrivia.onNewGame(action));
+cup.on('skip', (action) => PopTrivia.onSkip(action));
+cup.on('join', (action) => PopTrivia.onJoin(action));
+cup.on('leave', (action) => PopTrivia.onLeave(action));
+cup.on('pick', (action) => PopTrivia.onPick(action));
 
-fsg.submit();
+cup.submit();
