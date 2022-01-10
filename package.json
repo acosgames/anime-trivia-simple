@@ -2,8 +2,7 @@
   "name": "poptrivia",
   "version": "0.1.0",
   "dependencies": {
-    "acosgames": "../acosgames",
-    "animejs": "^3.2.1",
+    "acosgames": "^1.0.4",
     "flatstore": "^1.0.10",
     "nodemon": "^2.0.7",
     "react": "^17.0.2",
