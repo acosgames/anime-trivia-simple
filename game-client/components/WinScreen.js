@@ -11,40 +11,45 @@ class WinScreen extends Component {
         super(props);
     }
 
-    createWinner(index, name) {
-        return (<li key={index + name}><span>{winnerTable[index]}</span> {name}</li>)
+    createWinner(winpos, player) {
+        return (
+            <div className={"hstack-noh player-gameover player-" + winpos} key={"player" + player.name}>
+                <span className="winpos">{winnerTable[winpos]}</span>
+                <span className="player">{player.name}</span>
+                <span className="playerscore">{player.score || 0}</span>
+            </div>
+        )
     }
 
     processWinners() {
-        let winners = fs.get('state-winners');
+        let winners = fs.get('events-gameover');
         let players = fs.get('players');
 
         let winnerList = [];
         let winpos = 0;
-        let lastPoints = null;
+        let lastscore = null;
         for (var i = 0; i < winners.length; i++) {
             let id = winners[i];
             let player = players[id];
-            if (lastPoints != null && lastPoints != player.points)
+            if (lastscore != null && lastscore != player.score)
                 winpos++;
-            winnerList.push(this.createWinner(winpos, player.name))
+            winnerList.push(this.createWinner(winpos, player))
 
-            lastPoints = player.points;
+            lastscore = player.score;
         }
         return winnerList;
     }
 
     render() {
 
-        if (!this.props.events || !this.props.events['winner']) {
-            return <React.Fragment></React.Fragment>
-        }
+        let events = fs.get('events');
+
 
         speechSynthesis.cancel();
         let winnerList = this.processWinners();
 
         return (
-            <div className="winner">
+            <div className="players-gameover">
                 <ul>{winnerList}</ul>
             </div>
 
@@ -53,4 +58,4 @@ class WinScreen extends Component {
 
 }
 
-export default fs.connect(['events'])(WinScreen);
+export default fs.connect(['events-gameover'])(WinScreen);

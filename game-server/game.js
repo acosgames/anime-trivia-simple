@@ -4,8 +4,8 @@ let questions = cup.database();
 
 let defaultGame = {
     state: {
-        qid: 0,
-        history: [],
+        _qid: 0,
+        _history: [],
         category: '',
         question: '',
         choices: [],
@@ -14,8 +14,8 @@ let defaultGame = {
     },
     players: {},
     rules: {
-        rounds: 2,
-        maxplayers: 2
+        rounds: 10,
+        maxplayers: 10
     },
     next: {},
     events: []
@@ -33,7 +33,7 @@ class PopTrivia {
     startGame() {
         let players = cup.players();
         for (var id in players)
-            players[id].points = 0;
+            players[id].score = 0;
 
         this.nextRound();
     }
@@ -45,16 +45,7 @@ class PopTrivia {
 
         switch (state.stage) {
             case 0:
-                stage += 1;
-                cup.next({
-                    id: '*',
-                })
-                this.processNextQuestion();
-                cup.setTimelimit(60);
-                break;
-            case 1:
-                stage += 1;
-                cup.setTimelimit(15);
+                this.endOfRound();
                 break;
             default:
                 this.nextRound();
@@ -62,6 +53,42 @@ class PopTrivia {
         }
         //if (cup.reachedTimelimit(action))
 
+    }
+
+    nextQuestion() {
+        cup.next({
+            id: '*',
+        })
+        this.processNextQuestion();
+
+        cup.setTimelimit(15);
+    }
+    endOfRound() {
+        let state = cup.state();
+        state.stage += 1;
+        this.processCorrectAnswers();
+        cup.setTimelimit(6);
+
+        let question = questions[state._qid];
+        // cup.event('a', question.a);
+        state.a = question.a;
+    }
+
+    nextRound() {
+        let state = cup.state();
+        let rules = cup.rules();
+        if (state.round >= rules.rounds) {
+            this.processWinners();
+            return;
+        }
+
+
+        state.round += 1;
+        state.stage = 0;
+
+        cup.event('q', state.round);
+        this.resetPlayerChoices();
+        this.nextQuestion();
     }
 
     onJoin(action) {
@@ -73,7 +100,7 @@ class PopTrivia {
             return;
 
         //new player defaults
-        user.points = 0;
+        user.score = 0;
 
     }
 
@@ -81,9 +108,12 @@ class PopTrivia {
 
     onLeave(action) {
         let id = action.user.id;
-        let players = cup.players();
-        if (players[id]) {
-            delete players[id];
+        let players = cup.playerList();
+        // if (players[id]) {
+        //     delete players[id];
+        // }
+        if (players.length <= 1) {
+            this.processWinners();
         }
     }
 
@@ -126,25 +156,7 @@ class PopTrivia {
 
 
 
-    nextRound() {
-        this.processCorrectAnswers();
 
-        let state = cup.state();
-        state.round = state.round + 1;
-        state.stage = 0;
-
-        let rules = cup.rules();
-        if (state.round > rules.rounds) {
-            this.processWinners();
-            return;
-        }
-
-        cup.event('q', state.round);
-        cup.setTimelimit(5);
-
-        this.resetPlayerChoices();
-
-    }
 
     resetPlayerChoices() {
         let players = cup.players();
@@ -161,15 +173,15 @@ class PopTrivia {
         let state = cup.state();
 
         //find a random question not asked before
-        let qid = Math.floor(Math.random() * questions.length);
-        if (state.history.includes(qid)) {
+        let _qid = Math.floor(Math.random() * questions.length);
+        if (state._history.includes(_qid)) {
             this.processNextQuestion();
             return;
         }
 
         //setup next question
-        let question = questions[qid];
-        state.qid = qid;
+        let question = questions[_qid];
+        state._qid = _qid;
         state.question = question.q;
         state.category = question.c;
         if (question.t == 'boolean') {
@@ -185,8 +197,8 @@ class PopTrivia {
             }
             state.choices.sort();
         }
-        //save this question in history to avoid choosing again
-        state.history.push(qid);
+        //save this question in _history to avoid choosing again
+        state._history.push(_qid);
     }
 
     processWinners() {
@@ -200,17 +212,24 @@ class PopTrivia {
             playerList.push(players[id]);
         }
 
-        //sort all players by their points
+        //sort all players by their score
         playerList.sort((a, b) => {
-            a.points - b.points;
+            a.score - b.score;
         })
 
-        //get the top 10
+        //get the top 10 and rank them
+        let lastscore = null;
+        let winpos = 0;
         let winners = [];
         for (var i = 0; i < Math.min(playerList.length, 10); i++) {
             let player = playerList[i];
+            if (lastscore != null && lastscore != player.score)
+                winpos++;
+            player.rank = winpos;
+            lastscore = player.score;
             winners.push(player.id);
         }
+
 
         //remove id, so we don't send over network
         for (var id in players) {
@@ -220,8 +239,6 @@ class PopTrivia {
         let state = cup.state();
         state.winners = winners;
         cup.gameover(winners);
-
-        cup.killGame();
     }
 
     processCorrectAnswers() {
@@ -230,19 +247,19 @@ class PopTrivia {
         if (state.round <= 0)
             return;
 
-        //award points for correct choices, remove points for wrong choices
+        //award score for correct choices, remove score for wrong choices
         for (var id in players) {
             let player = players[id];
             if (typeof player._choice == 'undefined' || player._choice == null)
                 continue;
 
-            let answer = questions[state.qid].a;
+            let answer = questions[state._qid].a;
             let userChoice = state.choices[player._choice];
             if (answer == userChoice) {
-                player.points += 10;
+                player.score += 10;
             }
             else {
-                player.points -= 2;
+                player.score -= 2;
             }
         }
     }

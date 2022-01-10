@@ -107,7 +107,7 @@ export function GameLoader(props) {
 
         flatstoreUpdate(message);
 
-        if (message && message.events.gameover) {
+        if (message && message.events?.gameover) {
             needsReset = true;
         }
 
@@ -121,7 +121,7 @@ export function GameLoader(props) {
         console.log("CREATING TIMER LOOP");
         timerLoop();
 
-        send('ready', true);
+
     }, []);
 
 

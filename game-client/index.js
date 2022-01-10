@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { GameLoader } from './acosg';
-import './index.css';
+import './index.scss';
 
 import Gamescreen from './components/gamescreen';
 

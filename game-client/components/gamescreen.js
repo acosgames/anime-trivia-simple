@@ -3,10 +3,12 @@ import React, { Component } from 'react';
 import fs from 'flatstore';
 
 import AlertPanel from './alertpanel';
-import PlayerList from './playerlist';
+import Players from './Players';
 import Question from './Question';
 
 import WinScreen from './WinScreen';
+import PlayButton from './PlayButton';
+import RemainingTime from './RemainingTime';
 
 fs.set('userActivation', false);
 
@@ -31,31 +33,35 @@ class Gamescreen extends Component {
 
     render() {
         let userActivation = fs.get('userActivation');
+        if (!userActivation) {
+            return <PlayButton />
+        }
+
+        let events = fs.get('events');
+        if (events?.gameover) {
+            return (
+                <div className="vstack vcenter relative">
+                    <h3 className="gameover-text">Game Over</h3>
+                    <WinScreen></WinScreen>
+
+                    <h3 className="thanks-text">Thanks for playing!</h3>
+                </div>
+            )
+        }
 
         return (
-            <div className="gamewrapper" ref={el => {
+            <div className="vstack vcenter relative" ref={el => {
                 if (!el) return;
                 this.ref = el;
                 setTimeout(this.updatePosition.bind(this), 2000);
             }}>
 
-                {!userActivation && (<button className="userActivation" onClick={() => { fs.set('userActivation', true); }}>Play!</button>)}
-                {/* <AlertPanel /> */}
 
-                <PlayerList />
-                {/* <Speech stop={true}
-                    pause={true}
-                    resume={true}
-                    text="Welcome to react speech"
-                    voice="Microsoft Mark - English (United States)" /> */}
-                <div className="gamescreen">
+                <Players />
+                <RemainingTime />
+                <Question></Question>
 
-                    <div className="gamearea">
-                        <Question></Question>
-                        <WinScreen></WinScreen>
-                    </div>
 
-                </div>
             </div>
 
         )
@@ -63,4 +69,4 @@ class Gamescreen extends Component {
 
 }
 
-export default fs.connect(['userActivation'])(Gamescreen);
+export default fs.connect(['userActivation', 'events-gameover'])(Gamescreen);

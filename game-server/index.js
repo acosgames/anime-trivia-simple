@@ -9,4 +9,4 @@ cup.on('join', (action) => PopTrivia.onJoin(action));
 cup.on('leave', (action) => PopTrivia.onLeave(action));
 cup.on('pick', (action) => PopTrivia.onPick(action));
 
-cup.submit();
+cup.commit();

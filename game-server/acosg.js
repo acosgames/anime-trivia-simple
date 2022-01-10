@@ -98,7 +98,7 @@ class ACOSG {
         this.nextGame = game;
     }
 
-    submit() {
+    commit() {
         if (this.kickedPlayers.length > 0)
             this.nextGame.kick = this.kickedPlayers;
 

@@ -49,6 +49,7 @@ class Question extends Component {
         this.prevQuestion = question;
 
         this.setState({ question });
+        fs.set('choice', null);
     }
 
     onSpeakEnd() {
@@ -63,7 +64,7 @@ class Question extends Component {
         if (this.speakStage == 0) {
             fs.set('speakText', "Is it");
         }
-        else if (this.speakStage <= this.choicesText.length) {
+        else if (this.choicesText && this.speakStage <= this.choicesText.length) {
             fs.set('speakText', this.choicesText[this.speakStage - 1]);
         }
 
@@ -78,7 +79,7 @@ class Question extends Component {
         let choices = state.choices;
         let round = state.round;
         let maxRounds = rules.rounds;
-        let question = this.state.question;
+        let question = state.question;
         this.speakStage = 0;
 
         if (!choices || round > maxRounds) {
@@ -87,15 +88,17 @@ class Question extends Component {
 
 
         return (
-            <div className="question">
-                <Speak onEnd={this.onSpeakEnd}></Speak>
+            <div className="question vstack-noh  hcenter">
+                <Speak onEnd={this.onSpeakEnd.bind(this)}></Speak>
                 <QuestionText question={question}></QuestionText>
-                {choices.map((choice, index) => (
-                    <QuestionChoice key={'qc-' + index} id={index} choiceText={choiceTable[index] + ') ' + choice}></QuestionChoice>
-                ))}
+                <div className="choices vstack-zero vcenter hcenter">
+                    {choices.map((choice, index) => (
+                        <QuestionChoice key={'qc-' + index} id={index} choiceText={choice}></QuestionChoice>
+                    ))}
+                </div>
             </div>
         )
     }
 }
 
-export default fs.connect(['state-qid'])(Question);
+export default fs.connect(['state-question'])(Question);

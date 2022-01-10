@@ -11,7 +11,7 @@ class QuestionText extends Component {
         let question = this.props.question;
         return (
             <div
-                className="question-choice"
+                className="question-text"
                 dangerouslySetInnerHTML={{ __html: question }}>
             </div>
         )
