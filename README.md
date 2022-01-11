@@ -1,6 +1,10 @@
 # anime-trivia-simple
 Test your knowledge of Anime in this simple trivia game!  
 
+[View Acos Documentation](https://docs.acos.games)
+
+--- 
+
 ## Getting Started
 
 Requires Node v16+
