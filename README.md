@@ -48,9 +48,9 @@ A browser-sync is included so that your changes are reflected immediately.
 
 Server code is built using NodeJS code and bundled into a single `server.bundle.js` file for both developmet and production.
 
-`database.json` is used to store large amounts of data in JSON format.
+`database.json` is used to store large amounts of data in JSON format, and must be in the `./game-server/` folder
 
-It is accessed via `globals.database()`.
+It is accessed via `globals.database()` in the server code.  It is not shared with client.
 
 ## About Simulator
 
