@@ -18,7 +18,7 @@ let defaultGame = {
         maxplayers: 10
     },
     next: {},
-    events: []
+    events: {}
 }
 
 
