@@ -37,13 +37,20 @@ The game was designed to play in Scaled Resolution mode, 4:4 resolution, 1200 wi
 
 Client is built using ReactJS.  It will run inside an iframe and communicate with the parent frame which is the [Simulator's](https://github.com/acosgames/acosgames) client.  
 
-All assets (images, svg, audio) should be packed into a single `client.bundle.js` file.
+All assets (images, svg, audio) should be packed into a single javascript file:
+
+- `client.bundle.dev.js` for development
+- `client.bundle.js` for production.
 
 A browser-sync is included so that your changes are reflected immediately.
 
 ## About Server
 
-Server code is built using NodeJS code and bundled into a single `server.bundle.js` file.
+Server code is built using NodeJS code and bundled into a single `server.bundle.js` file for both developmet and production.
+
+`database.json` is used to store large amounts of data in JSON format.
+
+It is accessed via `globals.database()`.
 
 ## About Simulator
 
