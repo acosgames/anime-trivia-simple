@@ -33,10 +33,14 @@ class Question extends Component {
         if (!question || question.length == 0)
             return;
 
+
         if (this.prevQuestion != question) {
             speechSynthesis.cancel();
             fs.set('speakText', question);
             fs.set('speakStage', 0);
+        }
+        else {
+            return;
         }
 
         let choices = fs.get('state-choices');

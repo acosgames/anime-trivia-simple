@@ -77,12 +77,14 @@ class QuestionChoice extends Component {
     render() {
         let timeleft = fs.get('timeleft');
         let timer = fs.get('timer');
+        let local = fs.get('local');
+
         let maxTime = timer[1];
-        let speakStage = this.props.speakStage - 1;
-        if (speakStage < this.props.id && timeleft > maxTime - 15)
-            return <React.Fragment></React.Fragment>
+        // let speakStage = this.props.speakStage - 1;
+        // if (speakStage < this.props.id && timeleft > maxTime - 15)
+        //     return <React.Fragment></React.Fragment>
         let id = 'q' + this.props.id;
-        let isSelected = this.props.choice == this.props.id;
+        let isSelected = local.choice == this.props.id || local._choice == this.props.id;
         let classSelected = isSelected ? 'selected' : '';
 
         let state = fs.get('state');
@@ -117,4 +119,4 @@ class QuestionChoice extends Component {
 
 }
 
-export default fs.connect(['speakStage', 'choice', 'state-a'])(QuestionChoice);
+export default fs.connect(['choice', 'state-a'])(QuestionChoice);

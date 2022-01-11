@@ -14,7 +14,7 @@ let defaultGame = {
     },
     players: {},
     rules: {
-        rounds: 10,
+        rounds: 1,
         maxplayers: 10
     },
     next: {},
@@ -61,7 +61,7 @@ class PopTrivia {
         })
         this.processNextQuestion();
 
-        cup.setTimelimit(15);
+        cup.setTimelimit(5);
     }
     endOfRound() {
         let state = cup.state();
