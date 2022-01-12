@@ -39,7 +39,7 @@ The game was designed to play in Full Screen mode.
 
 ## About Client
 
-Client is built using ReactJS.  It will run inside an iframe and communicate with the parent frame which is the [Simulator's](https://github.com/acosgames/acosgames) client.  
+Game Client is built using ReactJS.  It will run inside an iframe and communicate with the parent frame which is the [Simulator's](https://github.com/acosgames/acosgames) client.  
 
 All assets (images, svg, audio) should be packed into a single javascript file:
 
@@ -50,7 +50,7 @@ A browser-sync is included so that your changes are reflected immediately.
 
 ## About Server
 
-Server code is built using NodeJS code and bundled into a single `server.bundle.js` file for both developmet and production.
+Game Server code is built using NodeJS code and bundled into a single `server.bundle.js` file for both developmet and production.
 
 `database.json` is used to store large amounts of data in JSON format, and must be in the `./game-server/` folder
 
