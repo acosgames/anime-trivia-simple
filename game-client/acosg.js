@@ -121,7 +121,7 @@ export function GameLoader(props) {
         console.log("CREATING TIMER LOOP");
         timerLoop();
 
-
+        send('ready', true);
     }, []);
 
 

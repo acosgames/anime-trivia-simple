@@ -41,7 +41,7 @@ h5 {
 }
 
 .time-text {
-  font-size: 6vh;
+  font-size: 4vh;
   font-weight: bold;
 }
 
@@ -176,7 +176,8 @@ h5 {
 .player {
   width: 10vw;
   height: 3vh;
-  font-size: 2vh;
+  font-size: 16px;
+  line-height: 26px;
   margin-right: 2vh;
   font-weight: bold;
   text-overflow: ellipsis;
@@ -202,7 +203,8 @@ h5 {
 }
 
 .playerscore {
-  font-size: 2vh;
+  font-size: 22px;
+  line-height: 26px;
 }
 
 .gameover-text {

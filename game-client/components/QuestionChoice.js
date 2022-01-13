@@ -78,17 +78,19 @@ class QuestionChoice extends Component {
         let timeleft = fs.get('timeleft');
         let timer = fs.get('timer');
         let local = fs.get('local');
-
+        let state = fs.get('state');
+        let events = fs.get('events');
+        let round = state?.round || 0;
         let maxTime = timer[1];
         // let speakStage = this.props.speakStage - 1;
         // if (speakStage < this.props.id && timeleft > maxTime - 15)
         //     return <React.Fragment></React.Fragment>
         let id = 'q' + this.props.id;
-        let isSelected = local.choice == this.props.id || local._choice == this.props.id;
+        let isSelected = local.choice == this.props.id;
         let classSelected = isSelected ? 'selected' : '';
 
-        let state = fs.get('state');
-        let events = fs.get('events');
+
+
         let status;
         let correctClass = '';
 

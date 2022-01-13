@@ -33,6 +33,7 @@ class Question extends Component {
         if (!question || question.length == 0)
             return;
 
+        fs.set('choice', null);
 
         if (this.prevQuestion != question) {
             speechSynthesis.cancel();
@@ -53,7 +54,7 @@ class Question extends Component {
         this.prevQuestion = question;
 
         this.setState({ question });
-        fs.set('choice', null);
+
     }
 
     onSpeakEnd() {
@@ -93,7 +94,7 @@ class Question extends Component {
 
         return (
             <div className="question vstack-noh  hcenter">
-                <Speak onEnd={this.onSpeakEnd.bind(this)}></Speak>
+                {/* <Speak onEnd={this.onSpeakEnd.bind(this)}></Speak> */}
                 <QuestionText question={question}></QuestionText>
                 <div className="choices vstack-zero vcenter hcenter">
                     {choices.map((choice, index) => (

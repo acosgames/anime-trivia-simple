@@ -32,10 +32,10 @@ class Gamescreen extends Component {
 
 
     render() {
-        let userActivation = fs.get('userActivation');
-        if (!userActivation) {
-            return <PlayButton />
-        }
+        // let userActivation = fs.get('userActivation');
+        // if (!userActivation) {
+        //     return <PlayButton />
+        // }
 
         let events = fs.get('events');
         if (events?.gameover) {

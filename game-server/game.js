@@ -1,3 +1,4 @@
+
 import cup from './acosg';
 
 let questions = cup.database();
@@ -14,7 +15,7 @@ let defaultGame = {
     },
     players: {},
     rules: {
-        rounds: 1,
+        rounds: 10,
         maxplayers: 10
     },
     next: {},
@@ -61,7 +62,7 @@ class PopTrivia {
         })
         this.processNextQuestion();
 
-        cup.setTimelimit(5);
+        cup.setTimelimit(20);
     }
     endOfRound() {
         let state = cup.state();
@@ -126,24 +127,27 @@ class PopTrivia {
         // }
 
         let state = cup.state();
-        let user = cup.players(action.user.id);
+        let player = cup.players(action.user.id);
 
         //get the picked cell
         let choice = action.payload.choice;
 
-        if (choice < 0 || choice > state.choices.length)
+        if (choice < 0 || choice > state.choices.length) {
+            cup.ignore();
             return;
+        }
 
-        user._choice = choice;
+
+        player.choice = choice;
 
         cup.event('picked');
-        state.picked = user.id;
+        state.picked = player.id;
 
         let voted = 0;
         let playerList = cup.playerList();
         for (var id of playerList) {
             let player = cup.players(id);
-            if (player._choice) {
+            if (player.choice != -1 && typeof player.choice !== 'undefined' && player.choice != null) {
                 voted++;
             }
         }
@@ -162,10 +166,12 @@ class PopTrivia {
         let players = cup.players();
         for (var id in players) {
             let player = players[id];
-            player.choices = player.choices || [];
-            if (typeof player._choice !== 'undefined' && player._choice != null)
-                player.choices.push(player._choice);
-            delete player._choice;
+            // player.choices = player.choices || [];
+            // if (typeof player._choice !== 'undefined' && player._choice != null)
+            //     player.choices.push(player._choice);
+            // else
+            //     player.choices.push(-1);
+            player.choice = -1;
         }
     }
 
@@ -214,7 +220,7 @@ class PopTrivia {
 
         //sort all players by their score
         playerList.sort((a, b) => {
-            a.score - b.score;
+            return b.score - a.score;
         })
 
         //get the top 10 and rank them
@@ -250,11 +256,11 @@ class PopTrivia {
         //award score for correct choices, remove score for wrong choices
         for (var id in players) {
             let player = players[id];
-            if (typeof player._choice == 'undefined' || player._choice == null)
+            if (typeof player.choice == 'undefined' || player.choice == null || player.choice == -1)
                 continue;
 
             let answer = questions[state._qid].a;
-            let userChoice = state.choices[player._choice];
+            let userChoice = state.choices[player.choice];
             if (answer == userChoice) {
                 player.score += 10;
             }
