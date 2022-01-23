@@ -109,11 +109,22 @@ class PopTrivia {
 
     onLeave(action) {
         let id = action.user.id;
-        let players = cup.playerList();
+        let players = cup.players();
+        // let playerList = cup.playerList();
+        let player = players[id];
+        if (player) {
+            player.forfeit = true;
+        }
+
+        let activeCount = 0;
+        for (var pid in players) {
+            if (!players[pid].forfeit)
+                activeCount++;
+        }
         // if (players[id]) {
         //     delete players[id];
         // }
-        if (players.length <= 1) {
+        if (activeCount <= 1) {
             this.processWinners();
         }
     }
