@@ -34,15 +34,17 @@ h5 {
 }
 
 .timeleft {
-  text-align: center;
+  text-align: right;
 }
 .round-text {
-  font-size: 4vh;
+  font-size: 4vw;
+  text-align: right;
 }
 
 .time-text {
-  font-size: 4vh;
+  font-size: 4vw;
   font-weight: bold;
+  text-align: right;
 }
 
 .relative {
@@ -77,7 +79,7 @@ h5 {
   z-index: 1;
 }
 .question-text {
-  font-size: 4vh;
+  font-size: 4vw;
   font-weight: bold;
   text-align: center;
   padding-left: 2vh;
@@ -176,7 +178,7 @@ h5 {
 .player {
   width: 10vw;
   height: 3vh;
-  font-size: 16px;
+  font-size: 12px;
   line-height: 26px;
   margin-right: 2vh;
   font-weight: bold;

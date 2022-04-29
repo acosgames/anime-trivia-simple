@@ -2,7 +2,7 @@
   "name": "poptrivia",
   "version": "0.1.0",
   "dependencies": {
-    "acosgames": "^1.0.13",
+    "acosgames": "^1.0.30",
     "flatstore": "^1.0.10",
     "nodemon": "^2.0.7",
     "react": "^17.0.2",
@@ -10,16 +10,13 @@
     "react-speech": "^1.0.2"
   },
   "scripts": {
-    "start": "./node_modules/.bin/concurrently npm:client-dev npm:server-dev npm:simulator npm:simulator-sync",
-    "client-dev": "./node_modules/.bin/webpack --config builds/webpack/client/dev.config.js --watch ./game-client",
-    "server-dev": "./node_modules/.bin/webpack --config builds/webpack/server/dev.config.js --watch ./game-server",
-    "simulator": "node --inspect --enable-source-maps ./node_modules/acosgames/simulator/server.js",
-    "simulator-sync": "./node_modules/.bin/wait-on http://localhost:3100/ && ./node_modules/.bin/browser-sync start --no-ghost-mode --ws --port 3200 --proxy localhost:3100 --files=./game-client/** --files=./builds/client/** --ignore=node_modules",
-    "dev:client": "./node_modules/.bin/webpack --config builds/webpack/client/dev.config.js",
-    "dev:server": "./node_modules/.bin/webpack --config builds/webpack/server/dev.config.js",
-    "build:client": "./node_modules/.bin/webpack --config builds/webpack/client/prod.config.js",
-    "build:server": "./node_modules/.bin/webpack --config builds/webpack/server/prod.config.js",
-    "deploy": "npm run build:client && npm run build:server && node --inspect ./node_modules/acosgames/simulator/deploy.js"
+    "start": "npm run client:dev & npm run server:dev & npx acos",
+    "client:dev": "npx webpack --config builds/webpack/client/dev.config.js --watch ./game-client",
+    "client:prod": "npx webpack --config builds/webpack/client/prod.config.js",
+    "server:dev": "npx webpack --config builds/webpack/server/dev.config.js --watch ./game-server",
+    "server:prod": "npx webpack --config builds/webpack/server/prod.config.js",
+    "deploy": "npm run client:prod && npm run server:prod && npx acos deploy",
+    "kill:win": "taskkill //im node.exe //F"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",

@@ -349,6 +349,7 @@ class PopTrivia {
         // let playerList = cup.playerList();
         let player = players[id];
         if (player) {
+            player.score -= 1000;
             player.forfeit = true;
         }
 
