@@ -5,6 +5,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+builds/client/
+builds/server/
 
 client.bundle.js
 server.bundle.js

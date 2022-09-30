@@ -45,8 +45,8 @@ class Players extends Component {
 
     render() {
 
-        let events = fs.get('events');
-        let isGameover = events?.gameover;
+        let roomStatus = fs.get('rooms-status');
+        let isGameover = roomStatus == 'gameover';
 
         return (
             <div className={isGameover ? 'players-gameover' : 'player-panel'}>
@@ -57,4 +57,4 @@ class Players extends Component {
 
 }
 
-export default fs.connect(['players', 'next-id', 'events-gameover'])(Players);;
+export default fs.connect(['players', 'next-id', 'room-status'])(Players);;
