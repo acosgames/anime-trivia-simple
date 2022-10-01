@@ -191,6 +191,7 @@ class PopTrivia {
         let state = cup.state();
 
         //find a random question not asked before
+        // cup.log("questions.length: " + questions?.length);
         let _qid = Math.floor(Math.random() * questions.length);
         if (state._history.includes(_qid)) {
             this.processNextQuestion();
@@ -199,6 +200,7 @@ class PopTrivia {
 
         //setup next question
         let question = questions[_qid];
+        // console.log("questions: " + JSON.stringify(question));
         state._qid = _qid;
         state.question = question.q;
         state.category = question.c;
@@ -210,6 +212,7 @@ class PopTrivia {
             //sort the choices alphabetically
             state.choices = [];
             state.choices.push(question.a);
+            // cup.log("questions.i.length: " + question?.i?.length);
             for (let i = 0; i < question.i.length; i++) {
                 state.choices.push(question.i[i]);
             }
