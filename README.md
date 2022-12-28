@@ -39,6 +39,15 @@ npm start
 
 The game was designed to play in Full Screen mode.
 
+## VSCode Debugging, add to launch.json
+```json
+{
+    "command": "npm start",
+    "name": "Launch Anime Trivia",
+    "request": "launch",
+    "type": "node-terminal"
+},
+```
 
 ## About Client
 
