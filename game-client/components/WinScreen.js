@@ -6,12 +6,12 @@ let winnerTable = [
     '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th'
 ]
 
-class WinScreen extends Component {
-    constructor(props) {
-        super(props);
-    }
+function WinScreen(props) {
 
-    createWinner(winpos, player) {
+
+    let [events] = fs.useWatch('events');
+
+    const createWinner = (winpos, player) => {
         return (
             <div className={"hstack-noh player-gameover player-" + winpos} key={"player" + player.name}>
                 <span className="winpos">{winnerTable[winpos]}</span>
@@ -21,8 +21,8 @@ class WinScreen extends Component {
         )
     }
 
-    processWinners() {
-        let winners = fs.get('events-gameover');
+    const processWinners = () => {
+        let winners = events?.gameover;
         let players = fs.get('players');
 
         let winnerList = [];
@@ -33,29 +33,25 @@ class WinScreen extends Component {
             let player = players[id];
             if (lastscore != null && lastscore != player.score)
                 winpos++;
-            winnerList.push(this.createWinner(winpos, player))
+            winnerList.push(createWinner(winpos, player))
 
             lastscore = player.score;
         }
         return winnerList;
     }
 
-    render() {
 
-        let events = fs.get('events');
+    speechSynthesis.cancel();
+    let winnerList = processWinners();
 
+    return (
+        <div className="players-gameover">
+            <ul>{winnerList}</ul>
+        </div>
 
-        speechSynthesis.cancel();
-        let winnerList = this.processWinners();
+    )
 
-        return (
-            <div className="players-gameover">
-                <ul>{winnerList}</ul>
-            </div>
-
-        )
-    }
 
 }
 
-export default fs.connect(['events-gameover'])(WinScreen);
+export default WinScreen;

@@ -2,42 +2,43 @@
 import React, { Component } from 'react';
 import fs from 'flatstore';
 
-class Speak extends Component {
-    constructor(props) {
-        super(props);
-        this.button = null;
-        this.prevQuestion = null;
-        this.voicesExist = false;
-        this.voices = speechSynthesis.getVoices()
-        speechSynthesis.onvoiceschanged = () => {
-            this.voicesExist = true;
-        }
+function Speak(props) {
 
-        fs.subscribe('speakText', this.onSpeakText);
+    let button = null;
+    let prevQuestion = null;
+    let voicesExist = false;
+    let voices = speechSynthesis.getVoices()
+    speechSynthesis.onvoiceschanged = () => {
+        voicesExist = true;
     }
 
-    onSpeakText = () => {
+    fs.subscribe('speakText', onSpeakText);
+
+    let [speakText] = fs.useWatch('speakText');
+    let [speakReady] = fs.useWatch('speakReady');
+
+    const onSpeakText = () => {
         let curQuestion = fs.get('speakText');
-        if (curQuestion == this.prevQuestion || curQuestion == '') {
+        if (curQuestion == prevQuestion || curQuestion == '') {
             return;
         }
-        this.prevQuestion = curQuestion;
-        this.speak(curQuestion);
+        prevQuestion = curQuestion;
+        speak(curQuestion);
     }
 
-    speak(text) {
-        if (!this.voicesExist) {
-            setTimeout(() => { this.speak(text) }, 1000);
+    const speak = (text) => {
+        if (!voicesExist) {
+            setTimeout(() => { speak(text) }, 1000);
             return;
         }
         fs.set('speakDone', false);
         var msg = new SpeechSynthesisUtterance();
-        if (!this.voices || this.voices.length == 0)
-            this.voices = speechSynthesis.getVoices();
+        if (!voices || voices.length == 0)
+            voices = speechSynthesis.getVoices();
 
         var englishVoices = [];
-        for (var i = 0; i < this.voices.length; i++) {
-            let voice = this.voices[i];
+        for (var i = 0; i < voices.length; i++) {
+            let voice = voices[i];
             if (voice.lang == 'en-US')
                 englishVoices.push(voice);
         }
@@ -53,19 +54,18 @@ class Speak extends Component {
         msg.lang = msg.voice.lang;
         msg.onend = (event) => {
             fs.set('speakDone', true);
-            if (this.props.onEnd)
-                this.props.onEnd(event)
+            if (props.onEnd)
+                props.onEnd(event)
         }
 
         speechSynthesis.speak(msg);
     }
 
-    render() {
-        return (
-            <React.Fragment></React.Fragment>
-        )
-    }
+    return (
+        <React.Fragment></React.Fragment>
+    )
+
 
 }
 
-export default fs.connect(['speakText', 'speakReady'])(Speak);
+export default Speak;

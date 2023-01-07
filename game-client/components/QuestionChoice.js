@@ -50,16 +50,14 @@ function CorrectAnswer(props) {
     )
 }
 
-class QuestionChoice extends Component {
-    constructor(props) {
-        super(props);
-    }
+function QuestionChoice(props) {
 
-    selectChoice(id) {
-        let choice = fs.get('choice');
-        if (choice != null)
-            return;
-        let state = fs.get('state');
+
+    let [choice] = fs.useWatch('choice');
+    let [state] = fs.useWatch('state');
+
+    const selectChoice = (id) => {
+
         if (state.stage != 0)
             return;
 
@@ -71,54 +69,48 @@ class QuestionChoice extends Component {
 
     }
 
+    // let timeleft = fs.get('timeleft');
+    let timer = fs.get('timer');
+    let local = fs.get('local');
+    // let events = fs.get('events');
+    // let round = state?.round || 0;
+    let maxTime = timer[1];
+    // let speakStage = this.props.speakStage - 1;
+    // if (speakStage < this.props.id && timeleft > maxTime - 15)
+    //     return <React.Fragment></React.Fragment>
+    let id = 'q' + props.id;
+    let isSelected = local.choice == props.id;
+    let classSelected = isSelected ? 'selected' : '';
 
 
 
-    render() {
-        let timeleft = fs.get('timeleft');
-        let timer = fs.get('timer');
-        let local = fs.get('local');
-        let state = fs.get('state');
-        let events = fs.get('events');
-        let round = state?.round || 0;
-        let maxTime = timer[1];
-        // let speakStage = this.props.speakStage - 1;
-        // if (speakStage < this.props.id && timeleft > maxTime - 15)
-        //     return <React.Fragment></React.Fragment>
-        let id = 'q' + this.props.id;
-        let isSelected = local.choice == this.props.id;
-        let classSelected = isSelected ? 'selected' : '';
+    let status;
+    let correctClass = '';
 
+    if (state?.stage == 1) {
 
-
-        let status;
-        let correctClass = '';
-
-        if (state?.stage == 1) {
-
-            if (state?.a == this.props.choiceText) {
-                status = <CorrectAnswer id={this.props.id} />
-                correctClass = 'correct';
-            } else {
-                status = <IncorrectAnswer id={this.props.id} />
-            }
-
+        if (state?.a == props.choiceText) {
+            status = <CorrectAnswer id={props.id} />
+            correctClass = 'correct';
+        } else {
+            status = <IncorrectAnswer id={props.id} />
         }
 
-        return (
-            <div className={"hstack-zero choice vcenter hcenter " + correctClass}>
-                <button key={id} id={id} className={"choice-button " + classSelected}
-                    onClick={() => {
-                        this.selectChoice(this.props.id)
-                    }}>
-                    <ChoiceText choiceText={this.props.choiceText} id={this.props.id} />
-                </button>
-                {status}
-            </div>
-
-        )
     }
+
+    return (
+        <div className={"hstack-zero choice vcenter hcenter " + correctClass}>
+            <button key={id} id={id} className={"choice-button " + classSelected}
+                onClick={() => {
+                    selectChoice(props.id)
+                }}>
+                <ChoiceText choiceText={props.choiceText} id={props.id} />
+            </button>
+            {status}
+        </div>
+
+    )
 
 }
 
-export default fs.connect(['choice', 'state-a'])(QuestionChoice);
+export default QuestionChoice;

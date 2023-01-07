@@ -3,12 +3,14 @@ import React, { Component } from 'react';
 
 import fs from 'flatstore';
 
-class Players extends Component {
-    constructor(props) {
-        super(props);
-    }
+function Players(props) {
 
-    createPlayer(player) {
+    let [players] = fs.useWatch('players');
+    let [next] = fs.useWatch('next');
+    let [room] = fs.useWatch('room');
+
+
+    const createPlayer = (player) => {
         return (
             <div className="hstack-noh" key={"player" + player.id}>
                 <span className="player">{player.name}</span>
@@ -17,13 +19,10 @@ class Players extends Component {
         )
     }
 
-    renderPlayers() {
+    const renderPlayers = () => {
         //not initialized yet
-
-
         //draw local player name
         let local = fs.get('local');
-        let players = fs.get('players');
 
         if (!players) {
             return (<React.Fragment></React.Fragment>)
@@ -31,30 +30,29 @@ class Players extends Component {
 
         let playerList = [];
 
-        playerList.push(this.createPlayer(local));
+        playerList.push(createPlayer(local));
 
         for (var id in players) {
             let player = players[id];
             if (player.name == local.name)
                 continue;
-            playerList.push(this.createPlayer(player))
+            playerList.push(createPlayer(player))
         }
 
         return playerList;
     }
 
-    render() {
 
-        let roomStatus = fs.get('rooms-status');
-        let isGameover = roomStatus == 'gameover';
+    let roomStatus = room?.status;
+    let isGameover = roomStatus == 'gameover';
 
-        return (
-            <div className={isGameover ? 'players-gameover' : 'player-panel'}>
-                {this.renderPlayers()}
-            </div>
-        )
-    }
+    return (
+        <div className={isGameover ? 'players-gameover' : 'player-panel'}>
+            {renderPlayers()}
+        </div>
+    )
+
 
 }
 
-export default fs.connect(['players', 'next-id', 'room-status'])(Players);;
+export default Players;
