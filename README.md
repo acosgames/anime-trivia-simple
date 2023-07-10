@@ -1,7 +1,7 @@
 # anime-trivia-simple
 Test your knowledge of Anime in this simple trivia game!  
 
-[View Acos Documentation](https://docs.acos.games)
+[View Acos Documentation](https://sdk.acos.games)
 
 --- 
 
