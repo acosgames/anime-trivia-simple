@@ -20,6 +20,29 @@ module.exports = {
                 use: ['style-loader', 'css-loader', 'sass-loader']
             },
             {
+                test: /\.(js|jsx|mjs)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        "presets": [
+                            ["@babel/preset-env", {
+                                "useBuiltIns": "usage",
+                                "corejs": 3, // or 2,
+                                "targets": {
+                                    "firefox": "64", // or whatever target to choose .    
+                                },
+                            }],
+                            "@babel/preset-react"
+                        ],
+                        "plugins": [
+                            "@babel/plugin-proposal-object-rest-spread",
+
+                        ]
+                    }
+                }
+            },
+            {
                 test: /\.(png|jpe?g|gif|svg|tiff|webp)$/i,
                 type: 'asset/resource',
                 generator: {
@@ -47,29 +70,6 @@ module.exports = {
                     filename: './assets/[name].[hash][ext][query]'
                 }
             },
-            {
-                test: /\.(js|jsx|mjs)$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        "presets": [
-                            ["@babel/preset-env", {
-                                "useBuiltIns": "usage",
-                                "corejs": 3, // or 2,
-                                "targets": {
-                                    "firefox": "64", // or whatever target to choose .    
-                                },
-                            }],
-                            "@babel/preset-react"
-                        ],
-                        "plugins": [
-                            "@babel/plugin-proposal-object-rest-spread",
-
-                        ]
-                    }
-                }
-            }
         ]
     },
     plugins: [
