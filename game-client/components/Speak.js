@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 import fs from 'flatstore';
 
+//NOTE: I wanted to add speaking, but its not necessary for the demo
+
 function Speak(props) {
 
     let button = null;

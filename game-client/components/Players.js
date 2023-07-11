@@ -10,9 +10,9 @@ function Players(props) {
     let [room] = fs.useWatch('room');
 
 
-    const createPlayer = (player) => {
+    const createPlayer = (player, isLocal) => {
         return (
-            <div className="hstack-noh" key={"player" + player.id}>
+            <div className={`hstack-noh ${isLocal ? 'localPlayer' : ''}`} key={"player" + player.id}>
                 <span className="player">{player.name}</span>
                 <span className="playerscore">{player.score || 0}</span>
             </div>
@@ -29,14 +29,9 @@ function Players(props) {
         }
 
         let playerList = [];
-
-        playerList.push(createPlayer(local));
-
         for (var id in players) {
             let player = players[id];
-            if (player.name == local.name)
-                continue;
-            playerList.push(createPlayer(player))
+            playerList.push(createPlayer(player, player.name == local?.name))
         }
 
         return playerList;
@@ -45,6 +40,11 @@ function Players(props) {
 
     let roomStatus = room?.status;
     let isGameover = roomStatus == 'gameover';
+
+
+    if (room?.status != 'gamestart' && room?.status != 'gameover') {
+        return <></>
+    }
 
     return (
         <div className={isGameover ? 'players-gameover' : 'player-panel'}>

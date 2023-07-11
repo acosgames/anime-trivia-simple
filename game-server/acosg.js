@@ -86,6 +86,11 @@ class ACOSG {
 
     }
 
+    //discrete random using room data, initialized before server script is run
+    random() {
+        return globals.random();
+    }
+
     ignore() {
         globals.ignore();
     }

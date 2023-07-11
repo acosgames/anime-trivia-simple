@@ -6,7 +6,7 @@ let winnerTable = [
     '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th'
 ]
 
-function WinScreen(props) {
+export default function WinScreen(props) {
 
 
     let [events] = fs.useWatch('events');
@@ -53,5 +53,3 @@ function WinScreen(props) {
 
 
 }
-
-export default WinScreen;

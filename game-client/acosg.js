@@ -74,7 +74,9 @@ export function GameLoader(props) {
         // if (message.prev) {
         //     fs.set('prev', message.prev);
         // }
-
+        if (message.room) {
+            fs.set('room', message.room);
+        }
         if (message.state) {
             fs.set('state', message.state);
         }

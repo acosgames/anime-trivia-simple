@@ -11,13 +11,11 @@ let defaultGame = {
         question: '',
         choices: [],
         round: 0,
-        stage: 0
-    },
-    players: {},
-    rules: {
+        stage: 0,
         rounds: 10,
         maxplayers: 10
     },
+    players: {},
     next: {},
     events: {}
 }
@@ -77,8 +75,8 @@ class PopTrivia {
 
     nextRound() {
         let state = cup.state();
-        let rules = cup.rules();
-        if (state.round >= rules.rounds) {
+        // let rules = cup.rules();
+        if (state.round >= state.rounds) {
             this.processWinners();
             return;
         }
@@ -150,16 +148,16 @@ class PopTrivia {
         }
 
 
-        player.choice = choice;
+        player._choice = choice;
 
-        cup.event('picked');
-        state.picked = player.id;
+        cup.event('picked', player.id);
+        // state.picked = player.id;
 
         let voted = 0;
         let playerList = cup.playerList();
         for (var id of playerList) {
             let player = cup.players(id);
-            if (player.choice != -1 && typeof player.choice !== 'undefined' && player.choice != null) {
+            if (player._choice != -1 && typeof player._choice !== 'undefined' && player._choice != null) {
                 voted++;
             }
         }
@@ -183,20 +181,46 @@ class PopTrivia {
             //     player.choices.push(player._choice);
             // else
             //     player.choices.push(-1);
-            player.choice = -1;
+            player._choice = -1;
         }
     }
 
     processNextQuestion() {
         let state = cup.state();
 
+
+        // let longestId = 0;
+        // let longest = 0;
+        // for (let i = 0; i < questions.length; i++) {
+
+        //     let answers = questions[i].a;
+        //     let incorrect = questions[i].i;
+
+        //     if (answers.length > longest) {
+        //         longestId = i;
+        //         longest = answers.length;
+        //     }
+
+        //     for (let j = 0; j < incorrect.length; j++) {
+        //         if (incorrect[j].length > longest) {
+        //             longest = incorrect[j].length;
+        //             longestId = i;
+        //         }
+        //     }
+        //     // if (questions[i].q.length > longest) {
+        //     //     longest = questions[i].q.length;
+        //     //     longestId = i;
+        //     // }
+        // }
+
         //find a random question not asked before
         // cup.log("questions.length: " + questions?.length);
-        let _qid = Math.floor(Math.random() * questions.length);
+        let _qid = Math.floor(cup.random() * questions.length);
         if (state._history.includes(_qid)) {
             this.processNextQuestion();
             return;
         }
+
 
         //setup next question
         let question = questions[_qid];
@@ -271,11 +295,11 @@ class PopTrivia {
         //award score for correct choices, remove score for wrong choices
         for (var id in players) {
             let player = players[id];
-            if (typeof player.choice == 'undefined' || player.choice == null || player.choice == -1)
+            if (typeof player._choice == 'undefined' || player._choice == null || player._choice == -1)
                 continue;
 
             let answer = questions[state._qid].a;
-            let userChoice = state.choices[player.choice];
+            let userChoice = state.choices[player._choice];
             if (answer == userChoice) {
                 player.score += 10;
             }
