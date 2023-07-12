@@ -1,5 +1,5 @@
 
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import fs from 'flatstore';
 
 import { send } from '../acosg';
@@ -28,7 +28,7 @@ function ChoiceText(props) {
 
 
 export default function QuestionChoice(props) {
-    let [choice] = fs.useWatch('choice');
+    let [localChoice] = fs.useWatch('local-_choice');
     let [state] = fs.useWatch('state');
 
     const selectChoice = (id) => {
@@ -37,11 +37,18 @@ export default function QuestionChoice(props) {
 
         console.log("Selected: ", id);
         send('pick', { choice: id })
-        fs.set('choice', id);
+        //fs.set('choice', id);
     }
 
-    let local = fs.get('local');
-    let isSelected = local._choice == props.id;
+    useEffect(() => {
+        //fs.set('choice', -1);
+    }, [state.round])
+
+    // let local = fs.get('local');
+    let isSelected = localChoice == props.id;
+    // if (local) {
+    //     isSelected = local._choice == props.id;
+    // }
     let status = 'none';
     let correctClass = '';
 
