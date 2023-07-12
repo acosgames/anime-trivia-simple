@@ -60,7 +60,7 @@ class PopTrivia {
         })
         this.processNextQuestion();
 
-        cup.setTimelimit(500);
+        cup.setTimelimit(20);
     }
     endOfRound() {
         let state = cup.state();
