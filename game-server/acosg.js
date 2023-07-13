@@ -1,3 +1,14 @@
+const globals = {
+    log,
+    error,
+    finish,
+    random,
+    game,
+    actions,
+    killGame,
+    database,
+    ignore
+}
 
 class ACOSG {
     constructor() {
